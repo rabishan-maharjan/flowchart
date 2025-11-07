@@ -1,0 +1,19 @@
+{
+    "name": "Arcube.Animation.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:108401dd6a625c94691fdec4ee674c68",
+        "GUID:35c72d66925ad464687f97bde11e4f28"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
