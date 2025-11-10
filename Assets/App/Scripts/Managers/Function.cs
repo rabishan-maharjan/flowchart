@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
@@ -10,6 +9,44 @@ public class Variable
     public VariableType Type;
     public string Value;
     public bool Assigned;
+    /// <summary>
+    /// Checks if Value can be correctly parsed based on its Type.
+    /// Returns true if valid, false otherwise.
+    /// </summary>
+    public bool VerifyType()
+    {
+        try
+        {
+            switch (Type)
+            {
+                case VariableType.String:
+                    return true;
+                case VariableType.Boolean:
+                    return bool.TryParse(Value, out _);
+                case VariableType.Int:
+                    return int.TryParse(Value, out _);
+                case VariableType.Float:
+                    return float.TryParse(Value, out _);
+                default:
+                    return false;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Variable '{Name}' has invalid value '{Value}' for type {Type}: {e.Message}");
+            return false;
+        }
+    }
+    
+    public object GetValue() =>
+        Type switch
+        {
+            VariableType.String => Value,
+            VariableType.Boolean => bool.Parse(Value),
+            VariableType.Int => int.Parse(Value),
+            VariableType.Float => float.Parse(Value),
+            _ => throw new Exception("Invalid variable type")
+        };
 }
 
 public class Function

@@ -16,15 +16,25 @@ public class IOManager : ManagerBase
 
     public void Save(string fileName, Dictionary<string, Function> code)
     {
+        var settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.All
+        };
+        
         var fullPath = Path.Combine(_projectFolder, fileName);
-        var data = JsonConvert.SerializeObject(code, Formatting.Indented);
+        var data = JsonConvert.SerializeObject(code, Formatting.Indented, settings);
         File.WriteAllText(fullPath, data);
     }
     
     public Dictionary<string, Function> Load(string fileName)
     {
+        var settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.All
+        };
+        
         var fullPath = Path.Combine(_projectFolder, fileName);
         var data = File.ReadAllText(fullPath);
-        return JsonConvert.DeserializeObject<Dictionary<string, Function>>(data);
+        return JsonConvert.DeserializeObject<Dictionary<string, Function>>(data, settings);
     }
 }

@@ -18,14 +18,12 @@ public class LoopNodeObject : CommandObject
         if (ConnectorLoopObject.NextNodeObject == connectorObject.ParentNodeObject)
         {
             Debug.LogWarning("cyclical");
-            ConnectorLoopObject.Clear();
             return false;
         }
 
         if (ConnectorLoopObject == connectorObject)
         {
             Debug.LogWarning("Self connection");
-            ConnectorLoopObject.Clear();
             return false;
         }
 

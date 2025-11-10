@@ -15,25 +15,6 @@ public enum ExpressionType
     Operator,
 }
 
-public enum Operator
-{
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Mod,
-    Pow,
-    And,
-    Or,
-    Not,
-    Equal,
-    NotEqual,
-    Less,
-    LessEqual,
-    Greater,
-    GreaterEqual,
-}
-
 public class ExpressionPair
 {
     public ExpressionType Type;
@@ -66,9 +47,9 @@ public class OutputCommand : Command
             Output += variable.Value;
         }
         
-        Completed = true;
         Function.OnOutput.Invoke(Output);
         
+        Completed = true;
         return Task.CompletedTask;
     }
 }
@@ -120,7 +101,7 @@ public class LogicCommand : Command
     
     public Variable Expression1;
     public Variable Expression2;
-    public Operator Operator;
+    public string Operator;
     public LogicCommand()
     {
         Name = "LogicCommand";
@@ -131,7 +112,7 @@ public class LogicCommand : Command
         Debug.Log("Executing " + Name);
         
         //check expression
-        var expression = Utils.RandomBool;
+        var expression = OperatorHandler.OperateLogic(Expression1, Expression2, Operator);
         //do something
         if (expression)
         {

@@ -27,7 +27,7 @@ public class FlowInputField : MonoBehaviour
             Text = "";
         });
         
-        gameObject.FindObject<ButtonImage>("b_delete").OnClick.AddListener(() =>
+        gameObject.FindObject<ButtonImage>("b_delete")?.OnClick.AddListener(() =>
         {
             OnDelete?.Invoke();
             inputField.SetTextWithoutNotify("");

@@ -17,14 +17,8 @@ public class OutputCommandUi : CommandUi
     }
 
     private List<Variable> _allVariables;
-    protected override void SetUi()
+    protected override void Start()
     {
-        _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        if (_allVariables.Count == 0)
-        {
-            //in future just show text field
-        }
-        
         b_add.OnClick.AddListener(() =>
         {
             var variableSelector = Instantiate(variableSelectorPrefab, variableSelectorPrefab.transform.parent);
@@ -35,6 +29,22 @@ public class OutputCommandUi : CommandUi
             
             b_add.transform.SetAsLastSibling();
         });
+        
+        base.Start();
+    }
+
+    protected override void SetUi()
+    {
+        _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
+        if (_allVariables.Count == 0)
+        {
+            //in future just show text field
+        }
+        
+        foreach (var variableSelector in GetComponentsInChildren<VariableSelector>())
+        {
+            Destroy(variableSelector.gameObject);
+        }
     }
 
     protected override void Apply()

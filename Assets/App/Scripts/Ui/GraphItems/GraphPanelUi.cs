@@ -5,7 +5,6 @@ using Arcube;
 using Arcube.AssetManagement;
 using Arcube.UiManagement;
 using NaughtyAttributes;
-using Newtonsoft.Json;
 using UnityEngine;
 
 public class GraphPanelUi : Ui
@@ -53,52 +52,62 @@ public class GraphPanelUi : Ui
 
         if (Input.GetMouseButtonDown(1))
         {
-            _ = CreateNode();
+            CreateNode();
         }
     }
 
-    private async Task CreateNode()
+    private async void CreateNode()
     {
-        var nodeSelectUi = UiManager.GetUi<NodeSelectUi>();
-        if (nodeSelectUi.State == UiState.Opened || nodeSelectUi.State == UiState.Opening)
+        try
         {
-            nodeSelectUi.Close();
-            return;
-        }
+            var nodeSelectUi = UiManager.GetUi<NodeSelectUi>();
+            if (nodeSelectUi.State is UiState.Opened or UiState.Opening)
+            {
+                nodeSelectUi.Close();
+                return;
+            }
         
-        // Get RectTransform of the container (the parent you instantiate into)
-        var containerRect = container.GetComponent<RectTransform>();
-        if (!containerRect) return;
+            // Get RectTransform of the container (the parent you instantiate into)
+            var containerRect = container.GetComponent<RectTransform>();
+            if (!containerRect) return;
 
-        // Choose the correct camera for ScreenPointToLocalPointInRectangle
-        var c = canvas; // assume this is your Canvas component
-        Camera cam = null;
-        if (c.renderMode != RenderMode.ScreenSpaceOverlay)
-            cam = c.worldCamera;
+            // Choose the correct camera for ScreenPointToLocalPointInRectangle
+            var c = canvas; // assume this is your Canvas component
+            Camera cam = null;
+            if (c.renderMode != RenderMode.ScreenSpaceOverlay)
+                cam = c.worldCamera;
 
-        // Convert screen point directly to local point in *container* coordinates
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, Input.mousePosition, cam, out Vector2 localPoint))
-            return;
+            // Convert screen point directly to local point in *container* coordinates
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, Input.mousePosition, cam, out var localPoint))
+                return;
 
-        // Show node selection UI (await)
-        var newNodePrefab = await UiManager.GetUi<NodeSelectUi>().SelectNode();
-        if (!newNodePrefab) return;
+            // Show node selection UI (await)
+            await nodeSelectUi.OpenAsync();
+            var newNodePrefab = nodeSelectUi.Selected;
+            if (!newNodePrefab) return;
 
-        // Instantiate under container
-        var nodeObject = Instantiate(newNodePrefab, container);
-        var nodeRect = nodeObject.GetComponent<RectTransform>();
-        if (!nodeRect) return;
+            // Instantiate under container
+            var nodeObject = Instantiate(newNodePrefab, container);
+            var nodeRect = nodeObject.GetComponent<RectTransform>();
+            if (!nodeRect) return;
 
-        // Ensure scale is correct (prefab import sometimes has wrong scale)
-        nodeRect.localScale = Vector3.one;
+            // Ensure scale is correct (prefab import sometimes has wrong scale)
+            nodeRect.localScale = Vector3.one;
 
-        // Set anchoredPosition to the local point we calculated
-        nodeRect.anchoredPosition = localPoint;
+            // Set anchoredPosition to the local point we calculated
+            nodeRect.anchoredPosition = localPoint;
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     [Button]
     public void GenerateCode()
     {
+        _flowChartManager.Functions.Clear();
+        
         foreach (var nodeObject in GetComponentsInChildren<NodeObject>())
         {
             nodeObject.GenerateCode(_flowChartManager);
@@ -124,7 +133,6 @@ public class GraphPanelUi : Ui
                 var rt = (RectTransform)obj.transform;
                 rt.anchoredPosition = node.AnchoredPosition.ToVector2();
                 nodesObjects.Add(obj);
-                Debug.Log(node.Name);
             }
         }
         
@@ -145,19 +153,40 @@ public class GraphPanelUi : Ui
                     if (logicCommand.NodeTrue != null)
                     {
                         var nextNodeObject = nodesObjects.Find(x => x.Node.ID == logicCommand.NodeTrue);
-                        if(nextNodeObject) ((LogicNodeObject)nodeObject).connectorTrue.Connect(nextNodeObject);
+                        if (nextNodeObject)
+                        {
+                            ((LogicNodeObject)nodeObject).connectorTrue.Connect(nextNodeObject);
+                        }
+                        else
+                        {
+                            Debug.Log($"Next node not found {logicCommand.NodeTrue}");
+                        }
                     }
                     
                     if (logicCommand.NodeFalse != null)
                     {
-                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == logicCommand.NodeTrue);
-                        if(nextNodeObject) ((LogicNodeObject)nodeObject).connectorFalse.Connect(nextNodeObject);
+                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == logicCommand.NodeFalse);
+                        if (nextNodeObject)
+                        {
+                            ((LogicNodeObject)nodeObject).connectorFalse.Connect(nextNodeObject);
+                        }
+                        else
+                        {
+                            Debug.Log($"Next node not found {logicCommand.NodeFalse}");
+                        }
                     }
                 }
                 else if (node is LoopCommand loopCommand && loopCommand.NextNode != null)
                 {
                     var nextNodeObject = nodesObjects.Find(x => x.Node.ID == loopCommand.NextNode);
-                    if(nextNodeObject) ((LoopNodeObject)nodeObject).ConnectorObject.Connect(nextNodeObject);
+                    if (nextNodeObject)
+                    {
+                        ((LoopNodeObject)nodeObject).ConnectorObject.Connect(nextNodeObject);
+                    }
+                    else
+                    {
+                        Debug.Log($"Next node not found {loopCommand.NextNode}");
+                    }
                 }
             }
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class ConnectorObject : GraphObject
 {
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
-    public NodeObject NextNodeObject { get; set; }
+    public NodeObject NextNodeObject { get; private set; }
     
     protected override void Reset()
     {
@@ -17,13 +17,12 @@ public class ConnectorObject : GraphObject
         GetComponent<ButtonImage>().OnClick.AddListener(Select);
     }
 
-    public override void Delete(bool force)
-    {
-        Clear();
-    }
-    
+    public override void Delete(bool force) => Clear();
+
     public void Connect(NodeObject nodeObject)
     {
+        Debug.Log($"Connecting {name} with {nodeObject.name}");
+        
         if (NextNodeObject)
         {
             NextNodeObject.PrevConnectorObject = null;

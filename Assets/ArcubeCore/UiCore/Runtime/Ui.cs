@@ -46,7 +46,6 @@ namespace Arcube.UiManagement
         /// open the ui
         ///  pass parameter if you want to be able to return back to and auto close current ui
         /// </summary>
-
         public virtual void Open()
         {
             if (State != UiState.Closed) return;
@@ -69,6 +68,7 @@ namespace Arcube.UiManagement
                 OnOpen();
             }
         }
+        
         public virtual async Task OpenAsync()
         {
             Open();

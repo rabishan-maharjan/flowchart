@@ -1,3 +1,4 @@
+using Arcube;
 using UnityEngine;
 
 public class LogicNodeObject : CommandObject
@@ -7,6 +8,7 @@ public class LogicNodeObject : CommandObject
     public override Node Node => _node ??= new LogicCommand();
     protected override void OpenCommandUi()
     {
+        UiManager.GetUi<LogicCommandUi>().Open((LogicCommand)Node);
     }
 
     protected override bool CanConnect(ConnectorObject connectorObject)
@@ -16,15 +18,13 @@ public class LogicNodeObject : CommandObject
             if (connectorTrue.NextNodeObject == connectorObject.ParentNodeObject)
             {
                 Debug.LogWarning("cyclical");
-                connectorTrue.Clear();
                 return false;
             }
 
             if (connectorTrue == connectorObject)
             {
                 Debug.LogWarning("Self connection");
-                connectorTrue.Clear();
-                return true;
+                return false;
             }
         }
         
@@ -33,18 +33,41 @@ public class LogicNodeObject : CommandObject
             if (connectorFalse.NextNodeObject == connectorObject.ParentNodeObject)
             {
                 Debug.LogWarning("cyclical");
-                connectorFalse.Clear();
                 return false;
             }
 
             if (connectorFalse == connectorObject)
             {
                 Debug.LogWarning("Self connection");
-                connectorFalse.Clear();
-                return true;
+                return false;
             }
         }
         
         return base.CanConnect(connectorObject);
+    }
+
+    public override void GenerateCode(FlowChartManager flowChartManager)
+    {
+        if (connectorFalse && connectorFalse.NextNodeObject)
+        {
+            var loopCommand = (LogicCommand)Node;
+            var nextNode = connectorFalse.NextNodeObject.Node;
+            if (nextNode != null)
+            {
+                loopCommand.NodeFalse = nextNode.ID;
+            }    
+        }
+        
+        if (connectorTrue && connectorTrue.NextNodeObject)
+        {
+            var loopCommand = (LogicCommand)Node;
+            var nextNode = connectorTrue.NextNodeObject.Node;
+            if (nextNode != null)
+            {
+                loopCommand.NodeTrue = nextNode.ID;
+            }    
+        }
+        
+        base.GenerateCode(flowChartManager);
     }
 }
