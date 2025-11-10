@@ -28,13 +28,22 @@ public class MenuPanel : MonoBehaviour
         
         gameObject.FindObject<ButtonImage>("b_open").OnClick.AddListener(Load);
         
-        gameObject.FindObject<ButtonImage>("b_run").OnClick.AddListener(async () =>
+        gameObject.FindObject<ButtonImage>("b_run").OnClick.AddListener(Compile);
+    }
+
+    private async void Compile()
+    {
+        try
         {
             _ = UiManager.GetUi<ConsoleUi>().OpenAsync();
             await Task.Yield();
             UiManager.GetUi<GraphPanelUi>().GenerateCode();
             _flowChartManager.Compile();
-        });
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     private async void Load()
@@ -44,7 +53,7 @@ public class MenuPanel : MonoBehaviour
             //show filename load ui
             var fileName = "test.flw";
             var code = _flowChartManager.Functions = _ioManager.Load(fileName);
-            await UiManager.GetUi<GraphPanelUi>().Decompile(code);
+            await UiManager.GetUi<GraphPanelUi>().GenerateFlowChart(code);
         }
         catch(Exception e)
         {

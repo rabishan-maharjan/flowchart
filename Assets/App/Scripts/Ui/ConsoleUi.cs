@@ -34,10 +34,7 @@ public class ConsoleUi : Ui
             ip_input.interactable = true;
         };
 
-        Function.OnError += value =>
-        {
-            AddError(value);
-        };
+        Function.OnError += AddError;
         
         gameObject.FindObject<ButtonImage>("b_close").OnClick.AddListener(Close);
         
@@ -45,8 +42,19 @@ public class ConsoleUi : Ui
         {
             AddText(value, true);
             _activeVariable.Value = value;
+            ((Command)Function.ActiveNode).Completed = true;
             ip_input.interactable = false;
         });
+    }
+
+    protected override void SetUi()
+    {
+        foreach (var panel in GetComponentsInChildren<ChatItemPanel>())
+        {
+            Destroy(panel.gameObject);
+        }
+        
+        base.SetUi();
     }
 
     private void AddText(string text, bool isUser)

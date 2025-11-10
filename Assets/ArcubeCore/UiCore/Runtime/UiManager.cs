@@ -116,11 +116,9 @@ namespace Arcube
         {
             if (!Instance) return;
 
-            Debug.Log("Removing " + ui.name);
             if (Instance.Uis.Contains(ui))
             {
                 Instance.Uis.Remove(ui);
-                Debug.Log("Removed " + ui.name);
             }
         }
 

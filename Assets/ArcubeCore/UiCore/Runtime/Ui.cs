@@ -15,8 +15,13 @@ namespace Arcube.UiManagement
 
     public abstract class Ui : MonoBehaviour
     {
+        [SerializeField] protected Canvas canvas;
         [SerializeField] private DOTweenAnimator animator;
-        protected virtual void Reset() => animator = GetComponentInChildren<DOTweenAnimator>();
+        protected virtual void Reset()
+        {
+            canvas = GetComponentInParent<Canvas>();
+            animator = GetComponentInChildren<DOTweenAnimator>();
+        }
 
         protected virtual void Awake() => UiManager.AddUi(this);
 
@@ -33,7 +38,7 @@ namespace Arcube.UiManagement
         /// <returns></returns>
         public virtual async Task Initialize(ManagerBase manager) => await Task.Run(() => { });
 
-        protected UiState State { get; set; } = UiState.Closed;
+        public UiState State { get; protected set; } = UiState.Closed;
 
         private static List<Ui> ActiveUis { get; set; } = new();
 
@@ -90,7 +95,7 @@ namespace Arcube.UiManagement
             ActiveUis.Add(this);
         }
 
-        public virtual void SetUi() { }
+        protected virtual void SetUi() { }
 
         public virtual void Close()
         {            

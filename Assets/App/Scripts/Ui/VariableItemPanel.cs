@@ -51,7 +51,7 @@ public class VariableItemPanel : PanelItem
 
     private void SetUi()
     {
-        t_type.text = _variable.Type;
+        t_type.text = _variable.Type.ToString();
         t_name.text = _variable.Name;
         t_value.text = _variable.Value;
     }

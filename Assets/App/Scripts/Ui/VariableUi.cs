@@ -37,11 +37,14 @@ public class VariableUi : Ui
             switch (type)
             {
                 case VariableType.Boolean:
+                    tb_value.IsOn = false;
                     break;
                 case VariableType.Float:
+                    ip_value.Text = "0";
                     ip_value.ContentType = TMP_InputField.ContentType.DecimalNumber;
                     break;
                 case VariableType.Int:
+                    ip_value.Text = "0";
                     ip_value.ContentType = TMP_InputField.ContentType.IntegerNumber;
                     break;
                 case VariableType.String:
@@ -78,12 +81,12 @@ public class VariableUi : Ui
 
     private void SetFields(Variable variable)
     {
-        var index = dr_type.options.FindIndex(option => option.text == variable.Type);
+        var index = dr_type.options.FindIndex(option => option.text == variable.Type.ToString());
         dr_type.value = index >= 0 ? index : 0;
         dr_type.RefreshShownValue();
             
         ip_name.Text = variable.Name;
-        var isBoolean = variable.Type == "Boolean";
+        var isBoolean = variable.Type == VariableType.Boolean;
         
         tb_value.gameObject.SetActive(isBoolean);
         ip_value.gameObject.SetActive(!isBoolean);
@@ -99,16 +102,10 @@ public class VariableUi : Ui
             MessageUi.Show("Name is required");
             return;
         }
-
-        if (string.IsNullOrWhiteSpace(ip_value.Text))
-        {
-            MessageUi.Show("Value is required");
-            return;
-        }
         
         _variable.Name = ip_name.Text;
-        _variable.Type = dr_type.options[dr_type.value].text;
-        if(_variable.Type != "Boolean") _variable.Value = ip_value.Text;
+        _variable.Type = (VariableType)dr_type.value;
+        if(_variable.Type != VariableType.Boolean) _variable.Value = ip_value.Text;
         else _variable.Value = tb_value ? "true" : "false";
         
         _variable.Assigned = true;

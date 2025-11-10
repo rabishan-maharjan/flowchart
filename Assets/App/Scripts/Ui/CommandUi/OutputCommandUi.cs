@@ -1,43 +1,52 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Arcube;
-using TMPro;
+using Arcube.UiManagement;
 using UnityEngine;
 
 public class OutputCommandUi : CommandUi
 {
-    [SerializeField] private TMP_Dropdown dr_add_variable;
+    [SerializeField] private VariableSelector variableSelectorPrefab;
+    [SerializeField] private ButtonImage b_add;
     protected override void Reset()
     {
-        transform.TryFindObject(nameof(dr_add_variable), out dr_add_variable);
-        
+        transform.TryFindObject(nameof(b_add), out b_add);
+        transform.TryFindObject(nameof(variableSelectorPrefab), out variableSelectorPrefab);
+
         base.Reset();
     }
 
-    private List<Variable> _variables;
-    protected override void Start()
+    private List<Variable> _allVariables;
+    protected override void SetUi()
     {
-        _variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        var variablesNames = _variables.Select(v => v.Name).ToList();
-        variablesNames.Insert(0, "Select");
-        dr_add_variable.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
+        _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
+        if (_allVariables.Count == 0)
+        {
+            //in future just show text field
+        }
         
-        base.Start();
+        b_add.OnClick.AddListener(() =>
+        {
+            var variableSelector = Instantiate(variableSelectorPrefab, variableSelectorPrefab.transform.parent);
+            var variablesNames = _allVariables.Select(v => v.Name).ToList();
+            variablesNames.Insert(0, "Select");
+            variablesNames.Insert(1, "New");
+            variableSelector.Set(variablesNames);
+            
+            b_add.transform.SetAsLastSibling();
+        });
     }
 
     protected override void Apply()
     {
         //update graph
         var outputCommand = (OutputCommand)Command;
-        if (dr_add_variable.value == 0)
+        foreach (var variableSelector in GetComponentsInChildren<VariableSelector>())
         {
-            Debug.Log("Select variable");
-            return;
+            var variable = variableSelector.GeVariable();
+            if (variable != null) outputCommand.Variables.Add(variable);
         }
-        
-        var variable = _variables[dr_add_variable.value - 1];
-        outputCommand.Variable = variable;
-        
+
         Close();
     }
 }

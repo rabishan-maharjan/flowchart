@@ -3,15 +3,12 @@ using UnityEngine;
 
 public class ConnectorObject : GraphObject
 {
-    public int id = 0;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
-    public Vector2 offset;
-    public GraphObject Connection { get; set; }
-    public FlowArrowObject Line { get; set; }
+    public NodeObject NextNodeObject { get; set; }
+    
     protected override void Reset()
     {
         ParentNodeObject = GetComponentInParent<NodeObject>();
-        offset = new Vector2(0, 35);
         base.Reset();
     }
 
@@ -20,8 +17,46 @@ public class ConnectorObject : GraphObject
         GetComponent<ButtonImage>().OnClick.AddListener(Select);
     }
 
+    public override void Delete(bool force)
+    {
+        Clear();
+    }
+    
+    public void Connect(NodeObject nodeObject)
+    {
+        if (NextNodeObject)
+        {
+            NextNodeObject.PrevConnectorObject = null;
+        }
+
+        if (nodeObject.PrevConnectorObject)
+        {
+            nodeObject.PrevConnectorObject.Clear();
+        }
+        
+        NextNodeObject = nodeObject;
+        nodeObject.PrevConnectorObject = this;
+
+        if(!TryGetComponent(out DynamicLineDrawer lineDrawer))
+        {
+            lineDrawer = gameObject.AddComponent<DynamicLineDrawer>();
+        } 
+        
+        _ = lineDrawer.Set((RectTransform)nodeObject.transform);
+    }
+    
     public void Clear()
     {
-        Line?.Delete(true);
+        NextNodeObject = null;
+        Debug.Log($"Clearing {name} child of {ParentNodeObject.name}", gameObject);
+        if (NextNodeObject)
+        {
+            NextNodeObject.PrevConnectorObject = null;
+        }
+        
+        if (TryGetComponent(out DynamicLineDrawer lineDrawer))
+        {
+            Destroy(lineDrawer);
+        }
     }
 }

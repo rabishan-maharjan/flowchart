@@ -13,9 +13,16 @@ public class NodeSelectUi : Ui
         base.Reset();
     }
 
+    private RectTransform _container;
     private void Start()
     {
+        _container = (RectTransform)transform.GetChild(0);
         gameObject.FindObject<ButtonImage>("b_close").OnClick.AddListener(Close);
+    }
+
+    protected override void SetUi()
+    {
+        FlowChartUtils.PositionUIAtMousePosition(canvas, _container);
     }
 
     [FormerlySerializedAs("graphPanel")] [SerializeField] private GraphPanelUi graphPanelUi;

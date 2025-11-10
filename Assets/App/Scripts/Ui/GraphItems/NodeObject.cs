@@ -1,55 +1,28 @@
 using System.Collections;
 using UnityEngine;
-using Arcube.UiManagement;
 using UnityEngine.EventSystems;
 using Arcube;
 
-public class GraphObject : PanelItem, IPointerClickHandler
-{
-    protected GraphPanelUi GraphPanelUi;
-    protected override void Awake()
-    {
-        base.Awake();
-        GraphPanelUi = GetComponentInParent<GraphPanelUi>();
-    }
-    
-    public virtual void OnPointerClick(PointerEventData eventData)
-    {
-        Select();
-    }
-
-    protected virtual void Select()
-    {
-        GraphPanelUi.Selected = this;
-    }
-
-    public virtual void Delete(bool force)
-    {
-        Destroy(gameObject);
-    }
-}
-
 public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 {
-    public GraphObject OtherConnection { get; set; }
     protected Node _node;
-    public virtual Node Node { get => _node;
+    public virtual Node Node
+    {
+        get => _node;
         set => _node = value;
     }
-    
-    public ConnectorObject connectorMain;
-    public ConnectorObject connectorSecondary;
-    
+    public ConnectorObject PrevConnectorObject { get; set; }
+    [field: SerializeField] public ConnectorObject ConnectorObject { get; private set; }
     protected override void Reset()
     {
-        connectorMain = GetComponentInChildren<ConnectorObject>();
+        ConnectorObject = GetComponentInChildren<ConnectorObject>();
         base.Reset();
     }
 
     private RectTransform _rectTransform;
     private Canvas _canvas;
     private Vector2 _dragOffset;
-    
+
     protected override void Awake()
     {
         base.Awake();
@@ -61,7 +34,7 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     {
         yield return null;
         yield return null;
-        
+
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
 
@@ -73,9 +46,9 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
         // Calculate the initial offset between the pointer and the object's position
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvas.transform as RectTransform, 
-            eventData.position, 
-            eventData.pressEventCamera, 
+            _canvas.transform as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
             out _dragOffset
         );
         _dragOffset -= _rectTransform.anchoredPosition;
@@ -87,28 +60,13 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
         // Adjust the position of the RectTransform based on the drag event
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvas.transform as RectTransform, 
-            eventData.position, 
-            eventData.pressEventCamera, 
+            _canvas.transform as RectTransform,
+            eventData.position,
+            eventData.pressEventCamera,
             out var localPoint
         );
 
         _rectTransform.anchoredPosition = localPoint - _dragOffset;
-
-        if (OtherConnection is ConnectorObject connectorObject)
-        {
-            GraphPanelUi.UpdateLine(connectorObject.Line, connectorObject, this);
-        }
-
-        if (connectorMain && connectorMain.Line)
-        {
-            GraphPanelUi.UpdateLine(connectorMain.Line, connectorMain, (NodeObject)connectorMain.Connection);
-        }
-        if (connectorSecondary && connectorSecondary.Line)
-        {
-            GraphPanelUi.UpdateLine(connectorSecondary.Line, connectorSecondary, (NodeObject)connectorSecondary.Connection);
-        }
-        
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
 
@@ -116,18 +74,69 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     {
         if (GraphPanelUi.Selected is ConnectorObject connectorObject)
         {
-            GraphPanelUi.Connect(connectorObject, this);
+            if (CanConnect(connectorObject)) connectorObject.Connect(this);
         }
-        
+
         base.Select();
     }
-    
+
     public override void Delete(bool force)
     {
-        if(!force && GraphPanelUi.Selected != this) return;
+        if (!force && GraphPanelUi.Selected != this) return;
         GraphPanelUi.Selected = null;
+
+        //delete lines from previous connector
+        PrevConnectorObject?.Clear();
         
-        connectorMain?.Clear();
+        ConnectorObject?.Clear();
         base.Delete(force);
+    }
+
+    //connection from connector object to node
+    protected virtual bool CanConnect(ConnectorObject connectorObject)
+    {
+        if(connectorObject.NextNodeObject == this)
+        {
+            //no need to connect
+            Debug.Log("Already connected to this node");
+            return false;
+        }
+        
+        if(this is StartNodeObject)
+        {
+            Debug.Log("Cannot connect to start node");
+            return false;
+        }
+        
+        //end node doesn't have a connector
+        if (!ConnectorObject) return true;
+        
+        if (ConnectorObject.NextNodeObject == connectorObject.ParentNodeObject)
+        {
+            Debug.LogWarning("cyclical");
+            return false;
+        }
+            
+        if (ConnectorObject == connectorObject)
+        {
+            Debug.LogWarning("Self connection");
+            return false;
+        }
+
+        return true;
+    }
+    
+    public virtual void GenerateCode(FlowChartManager flowChartManager)
+    {
+        if (ConnectorObject && ConnectorObject.NextNodeObject)
+        {
+            var nextNode = ConnectorObject.NextNodeObject.Node;
+            if (nextNode != null)
+            {
+                Node.NextNode = nextNode.ID;
+            }
+        }
+        
+        flowChartManager.AddNode(Node);
     }
 }

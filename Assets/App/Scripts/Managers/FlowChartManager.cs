@@ -3,44 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Arcube;
 
-public class Variable
-{
-    public string Name;
-    public string Type;
-    public string Value;
-    public bool Assigned;
-}
-
-public class Function
-{
-    public List<Variable> Variables { get; set; } = new(); 
-    public List<Node> Nodes { get; set; } = new();
-
-    public static event Action<Variable> OnInput;
-    public static event Action<string> OnOutput;
-    public static event Action<string> OnError;
-    public void Execute()
-    {
-        try
-        {
-            foreach (var node in Nodes)
-            {
-                if (node is Command command)
-                {
-                    command.Execute();
-                    if (command is InputCommand inputCommand) OnInput?.Invoke(inputCommand.Variable);
-                    if (command is OutputCommand outputCommand) OnOutput?.Invoke(outputCommand.Output);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            OnError?.Invoke(e.Message);
-            Log.AddError(()=> e.Message);
-        }
-    }
-}
-
 public enum AppState
 {
     New,
@@ -107,14 +69,10 @@ public class FlowChartManager : ManagerBase
         Functions["Main"].Execute();
     }
 
-    public void AddNode(Node node, Node prevNode, bool isMain)
+    public void AddNode(Node node)
     {
-        if (prevNode != null)
-        {
-            if(isMain) prevNode.NextMainNode = node.ID;
-            else prevNode.NextSecondaryNode = node.ID;
-        }
-        
         Functions[_activeFunction].Nodes.Add(node);
     }
+
+    public Node GetNode(string nextMainNode) => Functions[_activeFunction].Nodes.Find(x => x.ID == nextMainNode);
 }
