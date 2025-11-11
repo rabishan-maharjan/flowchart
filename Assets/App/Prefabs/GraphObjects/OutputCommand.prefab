@@ -35,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 56.085022, y: -17.5}
-  m_SizeDelta: {x: 0, y: 35}
+  m_AnchoredPosition: {x: 41.085, y: -17.5}
+  m_SizeDelta: {x: 82.17, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2910437483065159310
 CanvasRenderer:
@@ -66,7 +66,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Output
+  m_text: 'Output
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -131,7 +133,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 30, y: 0, z: 40, w: 0}
+  m_margin: {x: 20, y: 0, z: 20, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -398,7 +400,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 7
+  m_PixelsPerUnitMultiplier: 15
 --- !u!114 &2348956937888876549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -434,6 +436,10 @@ PrefabInstance:
     - target: {fileID: 6347291488279816371, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6347291488279816371, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6347291488279816371, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

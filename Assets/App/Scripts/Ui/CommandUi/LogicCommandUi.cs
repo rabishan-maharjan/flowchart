@@ -8,7 +8,7 @@ public class LogicCommandUi : CommandUi
 {
     [SerializeField] private TMP_Dropdown dr_expression_1;
     [SerializeField] private TMP_Dropdown dr_expression_2;
-    [SerializeField] private FlowInputField ip_logic;
+    [SerializeField] private TMP_InputField ip_logic;
     [SerializeField] private FlowInputField ip_expression_2;
 
     protected override void Reset()
@@ -41,7 +41,7 @@ public class LogicCommandUi : CommandUi
     {
         _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
         
-        var variablesNames = _allVariables.Select(v => v.Name).ToList();
+        var variablesNames = _allVariables.Where(v=> v.Exposed).Select(v => v.Name).ToList();
         dr_expression_1.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         
         variablesNames.Insert(0, "Select");
@@ -58,25 +58,31 @@ public class LogicCommandUi : CommandUi
         }
 
         var logicCommand = (LogicCommand)Command;
-        logicCommand.Expression1 = _allVariables[dr_expression_1.value];
+        var v1 = _allVariables[dr_expression_1.value];
+        logicCommand.Expression1 = _allVariables[dr_expression_1.value].ID;
 
         if (dr_expression_2.gameObject.activeSelf)
         {
-            logicCommand.Expression2 = _allVariables[dr_expression_2.value];
+            logicCommand.Expression2 = _allVariables[dr_expression_2.value].ID;
         }
         else
         {
             //validate
-            logicCommand.Expression2 = new Variable
+
+            var v = new Variable
             {
                 Name = ip_expression_2.Text,
                 Assigned = true,
-                Type = logicCommand.Expression1.Type,
+                Type = v1.Type,
                 Value = ip_expression_2.Text
             };
+            
+            AppManager.GetManager<FlowChartManager>().AddVariable(v);
+            
+            logicCommand.Expression2 = v.ID;
         }
 
-        logicCommand.Operator = ip_logic.Text;
+        logicCommand.Operator = ip_logic.text;
         
         base.Apply();
     }

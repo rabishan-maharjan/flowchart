@@ -18,7 +18,7 @@ public class InputCommandUi : CommandUi
     protected override void SetUi()
     {
         _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        var variablesNames = _allVariables.Select(v => v.Name).ToList();
+        var variablesNames = _allVariables.Where(v => v.Exposed).Select(v => v.Name).ToList();
         variablesNames.Insert(0, "Select");
         dr_add_variable.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
     }
@@ -34,7 +34,7 @@ public class InputCommandUi : CommandUi
         }
         
         var variable = _allVariables[dr_add_variable.value - 1];
-        inputCommand.Variable = variable;
+        inputCommand.Variable = variable.ID;
         
         Close();
     }

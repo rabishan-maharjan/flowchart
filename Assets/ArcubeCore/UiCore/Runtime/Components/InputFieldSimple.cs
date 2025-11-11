@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Arcube.UiManagement
 {
@@ -9,6 +10,7 @@ namespace Arcube.UiManagement
         [SerializeField] private ButtonText b_clear;
         [SerializeField] private TMP_InputField inputField;
         [SerializeField] private TMP_Text placeHolder;
+        public TMP_InputField.OnChangeEvent onValueChanged => inputField.onValueChanged;
         public string PlaceHolder
         {
             set => placeHolder.text = value;

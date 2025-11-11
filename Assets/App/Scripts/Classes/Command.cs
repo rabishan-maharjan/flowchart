@@ -5,22 +5,6 @@ using Arcube;
 using Newtonsoft.Json;
 using UnityEngine;
 
-public enum ExpressionType
-{
-    Select,
-    Text,
-    Number,
-    Variable,
-    Function,
-    Operator,
-}
-
-public class ExpressionPair
-{
-    public ExpressionType Type;
-    public object Value;
-}
-
 public abstract class Command : Node
 {
     public bool Completed { get; set; } = false;
@@ -32,7 +16,7 @@ public abstract class Command : Node
 
 public class OutputCommand : Command
 {
-    public List<Variable> Variables { get; set; } = new();
+    public List<string> Variables { get; set; } = new();
     public OutputCommand()
     {
         Name = "OutputCommand";
@@ -44,7 +28,8 @@ public class OutputCommand : Command
         Output = "";
         foreach (var variable in Variables)
         {
-            Output += variable.Value;
+            var v = AppManager.GetManager<FlowChartManager>().VariableMap[variable];
+            Output += v.Value;
         }
         
         Function.OnOutput.Invoke(Output);
@@ -61,10 +46,10 @@ public class InputCommand : Command
         Name = "InputCommand";    
     }
     
-    public Variable Variable { get; set; }
+    public string Variable { get; set; }
     public override async Task Execute()
     {
-        if (Variable == null)
+        if (string.IsNullOrEmpty(Variable))
         {
             throw new Exception("Variable is null");
         }
@@ -75,20 +60,22 @@ public class InputCommand : Command
 
 public class OperationCommand : Command
 {
-    public List<ExpressionPair> Expressions { get; set; } = new();
+    public string Assignee { get; set; }
+    public string Variable1 { get; set; }
+    public string Variable2 { get; set; }
+    public string Operator { get; set; }
     public OperationCommand()
     {
         Name = "OperationCommand";
-        Expressions = new();
     }
     
     public override Task Execute()
     {
-        foreach (var expression in Expressions)
-        {
-            //do something
-        }
-        
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        var v1 = flowChartManager.VariableMap[Variable1];
+        var v2 = flowChartManager.VariableMap[Variable2];
+        var result = OperatorHandler.OperateArithmetic(v1, v2, Operator);
+        flowChartManager.VariableMap[Assignee].Value = result.Value;
         Completed = true;
         return Task.CompletedTask;
     }
@@ -99,8 +86,8 @@ public class LogicCommand : Command
     public string NodeTrue;
     public string NodeFalse;
     
-    public Variable Expression1;
-    public Variable Expression2;
+    public string Expression1;
+    public string Expression2;
     public string Operator;
     public LogicCommand()
     {
@@ -111,8 +98,11 @@ public class LogicCommand : Command
     {
         Debug.Log("Executing " + Name);
         
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        var e1 = flowChartManager.VariableMap[NodeTrue];
+        var e2 = flowChartManager.VariableMap[NodeFalse];
         //check expression
-        var expression = OperatorHandler.OperateLogic(Expression1, Expression2, Operator);
+        var expression = OperatorHandler.OperateLogic(e1, e2, Operator);
         //do something
         if (expression)
         {

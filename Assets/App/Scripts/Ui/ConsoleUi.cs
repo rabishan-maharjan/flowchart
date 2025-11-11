@@ -30,7 +30,7 @@ public class ConsoleUi : Ui
         
         Function.OnInput += value =>
         {
-            _activeVariable = value;
+            _activeVariable = AppManager.GetManager<FlowChartManager>().VariableMap[value];
             ip_input.interactable = true;
         };
 

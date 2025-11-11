@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
 
 public class OutputCommandUi : CommandUi
 {
-    [SerializeField] private VariableSelector variableSelectorPrefab;
+    [SerializeField] private DropDownWithInputField dr_prefab;
     [SerializeField] private ButtonImage b_add;
     protected override void Reset()
     {
         transform.TryFindObject(nameof(b_add), out b_add);
-        transform.TryFindObject(nameof(variableSelectorPrefab), out variableSelectorPrefab);
+        transform.TryFindObject(nameof(dr_prefab), out dr_prefab);
 
         base.Reset();
     }
@@ -21,11 +20,8 @@ public class OutputCommandUi : CommandUi
     {
         b_add.OnClick.AddListener(() =>
         {
-            var variableSelector = Instantiate(variableSelectorPrefab, variableSelectorPrefab.transform.parent);
-            var variablesNames = _allVariables.Select(v => v.Name).ToList();
-            variablesNames.Insert(0, "Select");
-            variablesNames.Insert(1, "New");
-            variableSelector.Set(variablesNames);
+            var variableSelector = Instantiate(dr_prefab, dr_prefab.transform.parent);
+            variableSelector.Set(_allVariables);
             
             b_add.transform.SetAsLastSibling();
         });
@@ -41,7 +37,7 @@ public class OutputCommandUi : CommandUi
             //in future just show text field
         }
         
-        foreach (var variableSelector in GetComponentsInChildren<VariableSelector>())
+        foreach (var variableSelector in GetComponentsInChildren<DropDownWithInputField>())
         {
             Destroy(variableSelector.gameObject);
         }
@@ -51,10 +47,13 @@ public class OutputCommandUi : CommandUi
     {
         //update graph
         var outputCommand = (OutputCommand)Command;
-        foreach (var variableSelector in GetComponentsInChildren<VariableSelector>())
+        outputCommand.Variables.Clear();
+        foreach (var variableSelector in GetComponentsInChildren<DropDownWithInputField>())
         {
-            var variable = variableSelector.GeVariable();
-            if (variable != null) outputCommand.Variables.Add(variable);
+            var variable = variableSelector.Value;
+            if (variable == null) continue;
+            var id = variableSelector.Value.ID;
+            outputCommand.Variables.Add(id);
         }
 
         Close();

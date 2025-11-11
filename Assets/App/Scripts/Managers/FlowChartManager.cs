@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Arcube;
 
@@ -13,6 +14,8 @@ public enum AppState
 public class FlowChartManager : ManagerBase
 {
     private string _activeFunction = "Main";
+
+    public Dictionary<string, Variable> VariableMap { get; set; } = new();
     public Dictionary<string, Function> Functions { get; set; } = new();
     public List<Variable> ActiveVariables => Functions[_activeFunction].Variables;
     public List<Node> ActiveNodes => Functions[_activeFunction].Nodes;
@@ -25,13 +28,22 @@ public class FlowChartManager : ManagerBase
     public void Clear()
     {
         Functions.Clear();
+        Functions.Add("Main", new Function());
     }
 
+    public void ClearNodes()
+    {
+        foreach (var function in Functions)
+        {
+            function.Value.Nodes.Clear();
+        }
+    }
+    
     public event Action<AppState> OnCodeStateChanged;
     public void New()
     {
         Functions.Clear();
-        Functions.Add(_activeFunction, new Function());
+        Functions.Add("Main", new Function());
         
         OnCodeStateChanged?.Invoke(AppState.New);
     }
@@ -54,8 +66,11 @@ public class FlowChartManager : ManagerBase
     public void AddVariable(Variable variable)
     {
         var variables = Functions[_activeFunction].Variables;
-        if(variables.Contains(variable)) return;
-        variables.Add(variable);
+        VariableMap.TryAdd(variable.ID, variable);
+        if(!variables.Contains(variable))
+        {
+            variables.Add(variable);
+        }
     }
     
     public void RemoveVariable(Variable variable)
@@ -64,11 +79,11 @@ public class FlowChartManager : ManagerBase
         variables.Remove(variable);
     }
     
-    public void Compile()
+    public void Run()
     {
         Functions["Main"].Execute();
     }
-
+    
     public void AddNode(Node node)
     {
         Functions[_activeFunction].Nodes.Add(node);

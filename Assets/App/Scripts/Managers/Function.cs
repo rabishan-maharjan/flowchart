@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class Variable
 {
+    public string ID = Guid.NewGuid().ToString();
     public string Name;
     public VariableType Type;
     public string Value;
     public bool Assigned;
+    public bool Exposed = false;
+
     /// <summary>
     /// Checks if Value can be correctly parsed based on its Type.
     /// Returns true if valid, false otherwise.
@@ -54,7 +57,7 @@ public class Function
     public List<Variable> Variables { get; set; } = new(); 
     public List<Node> Nodes { get; set; } = new();
 
-    public static event Action<Variable> OnInput;
+    public static event Action<string> OnInput;
     public static Action<string> OnOutput;
     public static event Action<string> OnError;
     public static Node ActiveNode { get; private set; }

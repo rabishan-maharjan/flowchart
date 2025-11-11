@@ -109,6 +109,7 @@ public class VariableUi : Ui
         else _variable.Value = tb_value ? "true" : "false";
         
         _variable.Assigned = true;
+        _variable.Exposed = true;
         
         AppManager.GetManager<FlowChartManager>().AddVariable(_variable);
         

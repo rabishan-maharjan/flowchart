@@ -13,7 +13,7 @@ public class GraphPanelUi : Ui
     [SerializeField] private Transform container;
     public override Task Register()
     {
-        _flowChartManager =AppManager.GetManager<FlowChartManager>();
+        _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _flowChartManager.OnCodeStateChanged += async state =>
         {
             if (state != AppState.New) return;
@@ -106,7 +106,7 @@ public class GraphPanelUi : Ui
     [Button]
     public void GenerateCode()
     {
-        _flowChartManager.Functions.Clear();
+        _flowChartManager.ClearNodes();
         
         foreach (var nodeObject in GetComponentsInChildren<NodeObject>())
         {

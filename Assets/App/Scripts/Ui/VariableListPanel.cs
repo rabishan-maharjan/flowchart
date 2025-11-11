@@ -6,8 +6,10 @@ using UnityEngine;
 public class VariableListPanel : MonoBehaviour
 {
     private ListContainer _listContainer;
+    private FlowChartManager _flowChartManager;
     private void Start()
     {
+        _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _listContainer = GetComponentInChildren<ListContainer>();
         gameObject.FindObject<ButtonImage>("b_add_variable").OnClick.AddListener(AddVariable);
     }
@@ -27,8 +29,6 @@ public class VariableListPanel : MonoBehaviour
             panel.Set(variable);
             var siblingIndex = panel.transform.GetSiblingIndex();
             panel.transform.SetSiblingIndex(siblingIndex - 1);
-            
-            AppManager.GetManager<FlowChartManager>().AddVariable(variable);
         }
         catch (Exception e)
         {

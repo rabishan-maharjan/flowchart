@@ -26,7 +26,7 @@ public class VariableSelector : MonoBehaviour
         
         dr_add_variable.onValueChanged.AddListener((value) =>
         {
-            if (value == 1)
+            if (choices[value] == "New")
             {
                 ip_text.gameObject.SetActive(true);
                 dr_add_variable.SetValueWithoutNotify(0);
@@ -48,24 +48,20 @@ public class VariableSelector : MonoBehaviour
         gameObject.SetActive(true);
     }
     
-    public Variable GeVariable()
+    public string GeVariable()
     {
-        if (!string.IsNullOrWhiteSpace(ip_text.Text))
+        if (string.IsNullOrWhiteSpace(ip_text.Text))
+            return dr_add_variable.value == 0 ? null : _allVariables[dr_add_variable.value - 2].ID;
+        
+        var v = new Variable()
         {
-            return new Variable()
-            {
-                Type = VariableType.String,
-                Name = ip_text.Text,
-                Value = ip_text.Text,
-                Assigned = true
-            };
-        }
-
-        if (dr_add_variable.value == 0)
-        {
-            return null;
-        }
-
-        return _allVariables[dr_add_variable.value - 2];
+            Type = VariableType.String,
+            Name = ip_text.Text,
+            Value = ip_text.Text,
+            Assigned = true
+        };
+            
+        AppManager.GetManager<FlowChartManager>().AddVariable(v);
+        return v.ID;
     }
 }

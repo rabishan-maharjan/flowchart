@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Arcube;
 using TMPro;
@@ -6,65 +6,54 @@ using UnityEngine;
 
 public class OperationCommandUi : CommandUi
 {
-    [SerializeField] private TMP_Dropdown dr_add_expression;
+    [SerializeField] private TMP_Dropdown dr_variable;
     
-    [SerializeField] private TMP_InputField ip_text;
-    [SerializeField] private TMP_InputField ip_number;
-    [SerializeField] private TMP_Dropdown dr_add_variable;
-    [SerializeField] private TMP_Dropdown dr_add_function;
-    [SerializeField] private TMP_Dropdown dr_add_operator;
+    [SerializeField] private DropDownWithInputField v_1;
+    [SerializeField] private DropDownWithInputField v_2;
+    [SerializeField] private TMP_InputField ip_operator;
     protected override void Reset()
     {
-        transform.TryFindObject(nameof(dr_add_expression), out dr_add_expression);
-        transform.TryFindObject(nameof(ip_text), out ip_text);
-        transform.TryFindObject(nameof(ip_number), out ip_number);
-        transform.TryFindObject(nameof(dr_add_variable), out dr_add_variable);
-        transform.TryFindObject(nameof(dr_add_function), out dr_add_function);
-        transform.TryFindObject(nameof(dr_add_operator), out dr_add_operator);
+        transform.TryFindObject(nameof(dr_variable), out dr_variable);
+        transform.TryFindObject(nameof(v_1), out v_1);
+        transform.TryFindObject(nameof(v_2), out v_2);
+        transform.TryFindObject(nameof(ip_operator), out ip_operator);
         
         base.Reset();
     }
-    
-    protected override void Start()
+
+    private List<Variable> _allVariables;
+    private FlowChartManager _flowChartManager;
+    protected override void SetUi()
     {
-        base.Start();
+        _flowChartManager = AppManager.GetManager<FlowChartManager>();
+        _allVariables = _flowChartManager.ActiveVariables;
+        var variableNames = _allVariables.Where(v => v.Exposed).Select(variable => variable.Name).ToList();
+        dr_variable.options = variableNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         
-        dr_add_expression.options = Enum.GetNames(typeof(ExpressionType)).Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        dr_add_expression.onValueChanged.AddListener((value) =>
-        {
-            var obj = CreateExpressionField((ExpressionType)value);
-            if(!obj) return;
-            obj.gameObject.SetActive(true);
-            dr_add_expression.transform.SetAsLastSibling();
-            dr_add_expression.SetValueWithoutNotify(0);
-        });
-        dr_add_expression.value = -1;
-    }
-    
-    private Component CreateExpressionField(ExpressionType expressionType) =>
-        expressionType switch
-        {
-            ExpressionType.Text => Instantiate(ip_text, ip_text.transform.parent),
-            ExpressionType.Number => Instantiate(ip_number, ip_number.transform.parent),
-            ExpressionType.Variable => Instantiate(dr_add_variable, dr_add_variable.transform.parent),
-            ExpressionType.Function => Instantiate(dr_add_function, dr_add_function.transform.parent),
-            ExpressionType.Operator => Instantiate(dr_add_operator, dr_add_operator.transform.parent),
-            _ => null
-        };
-    
-    protected override void Apply()
-    {
-        //update graph
+        v_1.Set(_allVariables);
+        v_2.Set(_allVariables);
+        
+        base.SetUi();
     }
 
-    private object GetValue(ExpressionType type) =>
-        type switch
+    protected override void Apply()
+    {
+        if (_allVariables.Count == 0)
         {
-            ExpressionType.Text => ip_text.text,
-            ExpressionType.Number => int.Parse(ip_number.text),
-            ExpressionType.Variable => dr_add_variable.value,
-            ExpressionType.Function => dr_add_function.value,
-            ExpressionType.Operator => dr_add_operator.value,
-            _ => null
-        };
+            Debug.Log("Not enough variables");
+            return;
+        }
+        
+        var operationCommand = (OperationCommand)Command;
+
+        var v = _allVariables[dr_variable.value];
+        operationCommand.Assignee = v.ID;
+        v_1.Value.Type = v.Type;
+        v_2.Value.Type = v.Type;
+        operationCommand.Variable1 = v_1.Value.ID;
+        operationCommand.Variable2 = v_2.Value.ID;
+        operationCommand.Operator = ip_operator.text;
+        
+        base.Apply();
+    }
 }
