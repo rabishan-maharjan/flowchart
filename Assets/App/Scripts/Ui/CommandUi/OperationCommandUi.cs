@@ -1,8 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Arcube;
+using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
+
+public interface IGraph
+{
+    void Restore();
+    void Highlight();
+    void Error();
+}
 
 public class OperationCommandUi : CommandUi
 {
@@ -47,9 +55,28 @@ public class OperationCommandUi : CommandUi
         var operationCommand = (OperationCommand)Command;
 
         var v = _allVariables[dr_variable.value];
-        operationCommand.Assignee = v.ID;
+        operationCommand.Variable = v.ID;
+        if (v_1.Value == null || v_2.Value == null)
+        {
+            MessageUi.Show("Variable empty");
+            return;
+        }
+        
         v_1.Value.Type = v.Type;
         v_2.Value.Type = v.Type;
+        
+        if (!v_1.Value.IsValid() || !v_2.Value.IsValid())
+        {
+            MessageUi.Show("Variable doesn't match type");
+            return;
+        }
+
+        if (!OperatorHandler.Verify(ip_operator.text))
+        {
+            MessageUi.Show("Operator not found");
+            return;
+        }
+        
         operationCommand.Variable1 = v_1.Value.ID;
         operationCommand.Variable2 = v_2.Value.ID;
         operationCommand.Operator = ip_operator.text;

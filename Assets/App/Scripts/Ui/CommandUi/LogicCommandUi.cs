@@ -59,11 +59,11 @@ public class LogicCommandUi : CommandUi
 
         var logicCommand = (LogicCommand)Command;
         var v1 = _allVariables[dr_expression_1.value];
-        logicCommand.Expression1 = _allVariables[dr_expression_1.value].ID;
+        logicCommand.Variable1 = _allVariables[dr_expression_1.value].ID;
 
         if (dr_expression_2.gameObject.activeSelf)
         {
-            logicCommand.Expression2 = _allVariables[dr_expression_2.value].ID;
+            logicCommand.Variable2 = _allVariables[dr_expression_2.value].ID;
         }
         else
         {
@@ -79,7 +79,7 @@ public class LogicCommandUi : CommandUi
             
             AppManager.GetManager<FlowChartManager>().AddVariable(v);
             
-            logicCommand.Expression2 = v.ID;
+            logicCommand.Variable2 = v.ID;
         }
 
         logicCommand.Operator = ip_logic.text;

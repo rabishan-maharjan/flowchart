@@ -35,6 +35,8 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         yield return null;
         yield return null;
 
+        Image.color = GraphSettings.Instance.colors[Node.Name];
+
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
 

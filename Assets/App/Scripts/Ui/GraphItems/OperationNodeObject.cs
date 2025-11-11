@@ -1,11 +1,13 @@
+using System.Threading.Tasks;
 using Arcube;
 
 public class OperationNodeObject : CommandObject
 {
     public override Node Node => _node ??= new OperationCommand();
     
-    protected override void OpenCommandUi()
+    protected override async Task OpenCommandUi()
     {
-        UiManager.GetUi<OperationCommandUi>().Open((OperationCommand)Node);
+        await UiManager.GetUi<OperationCommandUi>().Open((OperationCommand)Node);
+        await base.OpenCommandUi();
     }
 }

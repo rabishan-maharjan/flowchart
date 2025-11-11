@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using AYellowpaper.SerializedCollections;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "GraphSettings", menuName = "Flow/Graph Settings")]
 public class GraphSettings : ScriptableObject
@@ -7,7 +8,7 @@ public class GraphSettings : ScriptableObject
     public float slopeThreshold = 45f; // Serialized slope threshold in degrees
     public Material lineMaterial; // Material for the line
     public GameObject arrowPrefab; // Prefab for the arrow (UI Image)
-    
+    public SerializedDictionary<string, Color> colors = new SerializedDictionary<string, Color>();
     private static GraphSettings _instance;
     public static GraphSettings Instance
     {

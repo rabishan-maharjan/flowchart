@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public abstract class CommandObject : NodeObject
@@ -14,7 +15,7 @@ public abstract class CommandObject : NodeObject
         
         if (Time.time - _lastClickTime < DoubleClickTime)
         {
-            OpenCommandUi();
+            _ = OpenCommandUi();
             _lastClickTime = 0;
         }
         else
@@ -23,5 +24,9 @@ public abstract class CommandObject : NodeObject
         }
     }
 
-    protected abstract void OpenCommandUi();
+    protected virtual async Task OpenCommandUi()
+    {
+        await Task.Yield();
+        Text = Command.GetDescription();
+    }
 }

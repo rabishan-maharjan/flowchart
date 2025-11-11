@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
@@ -6,9 +7,10 @@ public class LogicNodeObject : CommandObject
     public ConnectorObject connectorTrue;
     public ConnectorObject connectorFalse;
     public override Node Node => _node ??= new LogicCommand();
-    protected override void OpenCommandUi()
+    protected override async Task OpenCommandUi()
     {
-        UiManager.GetUi<LogicCommandUi>().Open((LogicCommand)Node);
+        await UiManager.GetUi<LogicCommandUi>().Open((LogicCommand)Node);
+        await base.OpenCommandUi();
     }
 
     protected override bool CanConnect(ConnectorObject connectorObject)

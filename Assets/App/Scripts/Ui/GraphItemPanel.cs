@@ -11,5 +11,7 @@ public class GraphItemPanel : PanelItem
         {
             UiManager.GetUi<NodeSelectUi>().SelectGraphObject(nodeObject);
         });
+        
+        Image.color = GraphSettings.Instance.colors[nodeObject.name];
     }
 }

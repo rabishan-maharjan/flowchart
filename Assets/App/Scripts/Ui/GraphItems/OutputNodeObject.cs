@@ -1,11 +1,13 @@
-﻿using Arcube;
+﻿using System.Threading.Tasks;
+using Arcube;
 
 public class OutputNodeObject : CommandObject
 {
     public override Node Node => _node ??= new OutputCommand();
 
-    protected override void OpenCommandUi()
+    protected override async Task OpenCommandUi()
     {
-        UiManager.GetUi<OutputCommandUi>().Open((Command)Node);
+        await UiManager.GetUi<OutputCommandUi>().Open((Command)Node);
+        await base.OpenCommandUi();
     }
 }

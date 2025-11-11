@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
@@ -6,9 +7,10 @@ public class LoopNodeObject : CommandObject
     [field: SerializeField] public ConnectorObject ConnectorLoopObject { get; set; }
     public override Node Node => _node ??= new LoopCommand();
 
-    protected override void OpenCommandUi()
+    protected override async Task OpenCommandUi()
     {
-        UiManager.GetUi<LoopCommandUi>().Open((LoopCommand)Node);
+        await UiManager.GetUi<LoopCommandUi>().Open((LoopCommand)Node);
+        await base.OpenCommandUi();
     }
 
     protected override bool CanConnect(ConnectorObject connectorObject)

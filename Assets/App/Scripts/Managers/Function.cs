@@ -16,31 +16,16 @@ public class Variable
     /// Checks if Value can be correctly parsed based on its Type.
     /// Returns true if valid, false otherwise.
     /// </summary>
-    public bool VerifyType()
-    {
-        try
+    public bool IsValid() =>
+        Type switch
         {
-            switch (Type)
-            {
-                case VariableType.String:
-                    return true;
-                case VariableType.Boolean:
-                    return bool.TryParse(Value, out _);
-                case VariableType.Int:
-                    return int.TryParse(Value, out _);
-                case VariableType.Float:
-                    return float.TryParse(Value, out _);
-                default:
-                    return false;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"Variable '{Name}' has invalid value '{Value}' for type {Type}: {e.Message}");
-            return false;
-        }
-    }
-    
+            VariableType.String => true,
+            VariableType.Boolean => bool.TryParse(Value, out _),
+            VariableType.Int => int.TryParse(Value, out _),
+            VariableType.Float => float.TryParse(Value, out _),
+            _ => false
+        };
+
     public object GetValue() =>
         Type switch
         {
