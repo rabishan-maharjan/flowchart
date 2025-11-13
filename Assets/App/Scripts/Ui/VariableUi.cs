@@ -8,6 +8,7 @@ using UnityEngine;
 
 public enum VariableType
 {
+    Dynamic,
     String,
     Boolean,
     Int,
@@ -102,16 +103,28 @@ public class VariableUi : Ui
             MessageUi.Show("Name is required");
             return;
         }
+
+        var flowchartManager = AppManager.GetManager<FlowChartManager>();
+        if (flowchartManager.ActiveVariables.FirstOrDefault(v => v.Name == ip_name.Text) != null)
+        {
+            MessageUi.Show("Name is already used");
+            return;
+        }
         
         _variable.Name = ip_name.Text;
         _variable.Type = (VariableType)dr_type.value;
+        if (_variable.Type == VariableType.Dynamic)
+        {
+            _variable.Type = Variable.DetectType(ip_value.Text);
+        }
+        
         if(_variable.Type != VariableType.Boolean) _variable.Value = ip_value.Text;
         else _variable.Value = tb_value ? "true" : "false";
         
         _variable.Assigned = true;
         _variable.Exposed = true;
         
-        AppManager.GetManager<FlowChartManager>().AddVariable(_variable);
+        flowchartManager.AddVariable(_variable);
         
         Close();
     }

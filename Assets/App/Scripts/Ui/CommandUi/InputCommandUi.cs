@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Arcube;
 using TMPro;
@@ -13,29 +14,44 @@ public class InputCommandUi : CommandUi
         
         base.Reset();
     }
-    
-    private List<Variable> _allVariables;
+
+    private List<Variable> _exposedVariables;
     protected override void SetUi()
     {
-        _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        var variablesNames = _allVariables.Where(v => v.Exposed).Select(v => v.Name).ToList();
-        variablesNames.Insert(0, "Select");
-        dr_add_variable.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
+        try
+        {
+            Debug.Log("Setting ui");
+            var flowChartManager = AppManager.GetManager<FlowChartManager>();
+            _exposedVariables = flowChartManager.ActiveVariables.Where(v => v.Exposed).ToList();
+            var variablesNames = _exposedVariables.Select(v => v.Name).ToList();
+            dr_add_variable.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
+
+            var inputCommand = (InputCommand)Command;
+            if (!string.IsNullOrEmpty(inputCommand.Variable))
+            {
+                var variable = flowChartManager.VariableMap[inputCommand.Variable];
+                dr_add_variable.value = _exposedVariables.IndexOf(variable);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     protected override void Apply()
     {
         //update graph
         var inputCommand = (InputCommand)Command;
-        if (dr_add_variable.value == 0)
+        if (_exposedVariables.Count == 0)
         {
-            Debug.Log("Select variable");
+            Debug.Log("No variables");
             return;
         }
         
-        var variable = _allVariables[dr_add_variable.value - 1];
+        var variable = _exposedVariables[dr_add_variable.value];
         inputCommand.Variable = variable.ID;
         
-        Close();
+        base.Apply();
     }
 }

@@ -16,7 +16,7 @@ public abstract class CommandUi : Ui
         gameObject.FindObject<ButtonImage>("b_ok").OnClick.AddListener(Apply);
     }
 
-    protected Command Command { get; set; }
+    protected Command Command { get; private set; }
 
     public virtual Task Open(Command command)
     {

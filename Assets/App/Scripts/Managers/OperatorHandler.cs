@@ -4,12 +4,12 @@ using System.Linq;
 
 public static class OperatorHandler
 {
-    private static readonly string[] ArithmeticOperators =
+    public static readonly string[] ArithmeticOperators =
     {
         "+", "-", "*", "/", "%"
     };
 
-    private static readonly string[] LogicOperators =
+    public static readonly string[] LogicOperators =
     {
         "&&", "||", "==", "!=", "<", "<=", ">", ">="
     };
@@ -19,9 +19,26 @@ public static class OperatorHandler
 
     public static Variable OperateArithmetic(Variable v1, Variable v2, string operatorName)
     {
-        float val1 = Convert.ToSingle(v1.GetValue());
-        float val2 = Convert.ToSingle(v2.GetValue());
-        float result = 0;
+        // ✅ String concatenation case
+        if (v1.Type == VariableType.String || v2.Type == VariableType.String)
+        {
+            if (operatorName == "+")
+            {
+                return new Variable
+                {
+                    Type = VariableType.String,
+                    Value = v1.Value + v2.Value,
+                    Assigned = true
+                };
+            }
+
+            throw new Exception($"Operator '{operatorName}' is not valid for strings.");
+        }
+
+        // ✅ Numeric arithmetic case
+        var val1 = Convert.ToSingle(v1.GetValue());
+        var val2 = Convert.ToSingle(v2.GetValue());
+        float result = 0f;
 
         switch (operatorName)
         {
@@ -49,16 +66,17 @@ public static class OperatorHandler
         };
     }
 
+
     public static bool OperateLogic(Variable v1, Variable v2, string operatorName)
     {
         // Convert both to float if numeric
-        bool v1IsNumber = v1.Type == VariableType.Int || v1.Type == VariableType.Float;
-        bool v2IsNumber = v2.Type == VariableType.Int || v2.Type == VariableType.Float;
+        var v1IsNumber = v1.Type == VariableType.Int || v1.Type == VariableType.Float;
+        var v2IsNumber = v2.Type == VariableType.Int || v2.Type == VariableType.Float;
 
         if (v1IsNumber && v2IsNumber)
         {
-            float val1 = Convert.ToSingle(v1.GetValue());
-            float val2 = Convert.ToSingle(v2.GetValue());
+            var val1 = Convert.ToSingle(v1.GetValue());
+            var val2 = Convert.ToSingle(v2.GetValue());
             return operatorName switch
             {
                 ">" => val1 > val2,
@@ -74,8 +92,8 @@ public static class OperatorHandler
         // Handle booleans
         if (v1.Type == VariableType.Boolean && v2.Type == VariableType.Boolean)
         {
-            bool b1 = (bool)v1.GetValue();
-            bool b2 = (bool)v2.GetValue();
+            var b1 = (bool)v1.GetValue();
+            var b2 = (bool)v2.GetValue();
             return operatorName switch
             {
                 "&&" => b1 && b2,
@@ -89,8 +107,8 @@ public static class OperatorHandler
         // Handle strings
         if (v1.Type == VariableType.String && v2.Type == VariableType.String)
         {
-            string s1 = (string)v1.GetValue();
-            string s2 = (string)v2.GetValue();
+            var s1 = (string)v1.GetValue();
+            var s2 = (string)v2.GetValue();
             return operatorName switch
             {
                 "==" => s1 == s2,

@@ -4,6 +4,7 @@ using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public interface IGraph
 {
@@ -15,33 +16,80 @@ public interface IGraph
 public class OperationCommandUi : CommandUi
 {
     [SerializeField] private TMP_Dropdown dr_variable;
-    
-    [SerializeField] private DropDownWithInputField v_1;
-    [SerializeField] private DropDownWithInputField v_2;
-    [SerializeField] private TMP_InputField ip_operator;
+    [FormerlySerializedAs("operatorExpressionPrefab")] [SerializeField] private OperatorExpressionPanel operatorExpressionPanelPrefab;
     protected override void Reset()
     {
         transform.TryFindObject(nameof(dr_variable), out dr_variable);
-        transform.TryFindObject(nameof(v_1), out v_1);
-        transform.TryFindObject(nameof(v_2), out v_2);
-        transform.TryFindObject(nameof(ip_operator), out ip_operator);
         
         base.Reset();
     }
 
+    [SerializeField] private Transform list;
+    private void UpdateVariableLists(VariableType type)
+    {
+    }
+
     private List<Variable> _allVariables;
+    private List<Variable> _exposedVariables;
     private FlowChartManager _flowChartManager;
     protected override void SetUi()
     {
+        foreach (var e in GetComponentsInChildren<OperatorExpressionPanel>())
+        {
+            Destroy(e.gameObject);
+        }
+        
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _allVariables = _flowChartManager.ActiveVariables;
-        var variableNames = _allVariables.Where(v => v.Exposed).Select(variable => variable.Name).ToList();
+        _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+        var variableNames = _exposedVariables.Select(variable => variable.Name).ToList();
         dr_variable.options = variableNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
+        variableNames.Insert(0, "New");
         
-        v_1.Set(_allVariables);
-        v_2.Set(_allVariables);
+        //load old variables
+        var operationCommand = (OperationCommand)Command;
+        foreach (var expression in operationCommand.Expressions)
+        {
+            AddField(expression);
+        }
+        
+        if(list.childCount == 1) AddField(new Expression());
+        
+        var selected = _exposedVariables[dr_variable.value];
+        UpdateVariableLists(selected.Type);
         
         base.SetUi();
+    }
+
+    private void AddField(Expression expression)
+    {
+        var selected = _exposedVariables[dr_variable.value];
+        var variables = _exposedVariables.Where(v => v.Type == selected.Type).ToList();
+        var operatorExpression = Instantiate(operatorExpressionPanelPrefab, list);
+        
+        var v = new Variable();
+        if (expression.Variable != null) _flowChartManager.VariableMap.TryGetValue(expression.Variable, out v);
+        operatorExpression.Set(variables, v, expression.Operator);
+        
+        operatorExpression.onOperatorSelected.AddListener(value =>
+        {
+            if (value == 0)
+            {
+                //destroy next child
+                var nextChild = list.GetChild(transform.GetSiblingIndex() + 1);
+                if (nextChild)
+                {
+                    MessageUi.Show("Remaining expressions will be ignored");
+                }
+            }
+            else
+            {
+                if(list.childCount == operatorExpression.transform.GetSiblingIndex() + 1)
+                {
+                    AddField(new Expression());
+                }
+            }
+        });
     }
 
     protected override void Apply()
@@ -51,35 +99,28 @@ public class OperationCommandUi : CommandUi
             Debug.Log("Not enough variables");
             return;
         }
-        
         var operationCommand = (OperationCommand)Command;
-
-        var v = _allVariables[dr_variable.value];
+        operationCommand.Expressions.Clear();
+        
+        var v = _exposedVariables[dr_variable.value];
         operationCommand.Variable = v.ID;
-        if (v_1.Value == null || v_2.Value == null)
+        for (var i = 0; i < list.childCount; i++)
         {
-            MessageUi.Show("Variable empty");
-            return;
+            var operatorExpression = list.GetChild(i).GetComponent<OperatorExpressionPanel>();
+            var ve = operatorExpression.dr_variable.Value;
+            ve.Type = Variable.DetectType(ve.Value);
+            if (ve.Type != v.Type)
+            {
+                MessageUi.Show("Variable type mismatch");
+                return;
+            }
+            
+            operationCommand.Expressions.Add(new Expression()
+            {
+                Variable = operatorExpression.dr_variable.Value.ID,
+                Operator = operatorExpression.dr_operator.value > 0 ? OperatorHandler.ArithmeticOperators[operatorExpression.dr_operator.value - 1] : ""
+            });
         }
-        
-        v_1.Value.Type = v.Type;
-        v_2.Value.Type = v.Type;
-        
-        if (!v_1.Value.IsValid() || !v_2.Value.IsValid())
-        {
-            MessageUi.Show("Variable doesn't match type");
-            return;
-        }
-
-        if (!OperatorHandler.Verify(ip_operator.text))
-        {
-            MessageUi.Show("Operator not found");
-            return;
-        }
-        
-        operationCommand.Variable1 = v_1.Value.ID;
-        operationCommand.Variable2 = v_2.Value.ID;
-        operationCommand.Operator = ip_operator.text;
         
         base.Apply();
     }

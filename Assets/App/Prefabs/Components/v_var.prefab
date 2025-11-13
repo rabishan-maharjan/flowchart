@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1488509459136379928
 RectTransform:
   m_ObjectHideFlags: 0
@@ -141,6 +141,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1344583999444926961, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1344583999444926961, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1737651397864319592, guid: ce964aa82bb1ebe41a3a3371e7465f24, type: 3}
     - target: {fileID: 3196749799171047746, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_Name
       value: ip_text
@@ -154,6 +162,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
     - target: {fileID: 3385661096070862859, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -2923171080115597416, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
+    - target: {fileID: 3385661096070862859, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 1
       objectReference: {fileID: 0}
@@ -161,6 +173,10 @@ PrefabInstance:
       propertyPath: m_fontAsset
       value: 
       objectReference: {fileID: 11400000, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
+    - target: {fileID: 4234389062020625364, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -2923171080115597416, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
     - target: {fileID: 4234389062020625364, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 1
@@ -170,19 +186,40 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
     - target: {fileID: 4349860490537793632, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -2923171080115597416, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
+    - target: {fileID: 4349860490537793632, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7414684203535583912, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7414684203535583912, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7414684203535583912, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8384709529001804022, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_fontAsset
       value: 
       objectReference: {fileID: 11400000, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
+    - target: {fileID: 8384709529001804022, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -2923171080115597416, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
     - target: {fileID: 8384709529001804022, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1799563303096129261, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e79ac734b9bf0042aed8c57511cc58a, type: 3}

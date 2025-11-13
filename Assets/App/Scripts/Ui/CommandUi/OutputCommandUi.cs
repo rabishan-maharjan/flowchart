@@ -1,46 +1,59 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Arcube;
-using Arcube.UiManagement;
 using UnityEngine;
 
 public class OutputCommandUi : CommandUi
 {
     [SerializeField] private DropDownWithInputField dr_prefab;
-    [SerializeField] private ButtonImage b_add;
     protected override void Reset()
     {
-        transform.TryFindObject(nameof(b_add), out b_add);
         transform.TryFindObject(nameof(dr_prefab), out dr_prefab);
 
         base.Reset();
     }
 
     private List<Variable> _allVariables;
-    protected override void Start()
-    {
-        b_add.OnClick.AddListener(() =>
-        {
-            var variableSelector = Instantiate(dr_prefab, dr_prefab.transform.parent);
-            variableSelector.Set(_allVariables);
-            
-            b_add.transform.SetAsLastSibling();
-        });
-        
-        base.Start();
-    }
-
+    private List<Variable> _exposedVariables;
+    [SerializeField] private Transform list;
     protected override void SetUi()
     {
-        _allVariables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        if (_allVariables.Count == 0)
-        {
-            //in future just show text field
-        }
-        
         foreach (var variableSelector in GetComponentsInChildren<DropDownWithInputField>())
         {
             Destroy(variableSelector.gameObject);
         }
+
+        var flowChartManager = AppManager.GetManager<FlowChartManager>(); 
+        _allVariables = flowChartManager.ActiveVariables;
+        _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+        
+        //load old variables
+        var outputCommand = (OutputCommand)Command;
+        foreach (var variable in outputCommand.Variables)
+        {
+            var v = flowChartManager.VariableMap[variable];
+            AddNewField(v);
+        }
+        
+        AddNewField(new Variable());
+    }
+    
+    private void AddNewField(Variable variable)
+    {
+        var variableSelector = Instantiate(dr_prefab, list);
+        variableSelector.Set(_exposedVariables, variable);
+
+        void HandleValueSelected(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return;
+            var index = variableSelector.transform.GetSiblingIndex();
+            if (index == variableSelector.transform.parent.childCount - 1)
+            {
+                AddNewField(new Variable());
+            }
+        }
+
+        variableSelector.onValueChanged.AddListener(HandleValueSelected);
     }
 
     protected override void Apply()
@@ -56,6 +69,6 @@ public class OutputCommandUi : CommandUi
             outputCommand.Variables.Add(id);
         }
 
-        Close();
+        base.Apply();
     }
 }

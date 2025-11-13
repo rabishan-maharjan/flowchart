@@ -1,12 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Arcube;
+
+public class Expression
+{
+    public string Variable;
+    public string Operator;
+}
 
 public class OperationCommand : Command
 {
     public string Variable { get; set; }
-    public string Variable1 { get; set; }
-    public string Variable2 { get; set; }
-    public string Operator { get; set; }
+    public List<Expression> Expressions { get; set; } = new();
     public OperationCommand()
     {
         Name = "OperationCommand";
@@ -14,12 +20,34 @@ public class OperationCommand : Command
     
     public override Task Execute()
     {
-        var flowChartManager = AppManager.GetManager<FlowChartManager>();
-        var v1 = flowChartManager.VariableMap[Variable1];
-        var v2 = flowChartManager.VariableMap[Variable2];
-        var result = OperatorHandler.OperateArithmetic(v1, v2, Operator);
-        flowChartManager.VariableMap[Variable].Value = result.Value;
-        Completed = true;
+        try
+        {
+            var flowChartManager = AppManager.GetManager<FlowChartManager>();
+            Variable result = new();
+            for (var i = 0; i < Expressions.Count; i++)
+            {
+                if (i == 0)
+                {
+                    result = new(flowChartManager.VariableMap[Expressions[i].Variable]);
+                }
+                else
+                {
+                    var v2 = flowChartManager.VariableMap[Expressions[i].Variable];
+                    result = OperatorHandler.OperateArithmetic(result, v2, Expressions[i - 1].Operator);
+                }
+                
+                if(string.IsNullOrEmpty(Expressions[i].Operator)) break;
+            }
+
+            flowChartManager.VariableMap[Variable].Value = result.Value;
+
+            Completed = true;
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
+        
         return Task.CompletedTask;
     }
 
