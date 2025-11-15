@@ -1,68 +1,82 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Arcube;
 using Arcube.UiManagement;
-using TMPro;
 using UnityEngine;
 
 public class LogicCommandUi : CommandUi
 {
-    [SerializeField] private TMP_Dropdown dr_variable_1;
-    [SerializeField] private TMP_Dropdown dr_operator;
-    [SerializeField] private DropDownWithInputField dr_variable_2;
-    protected override void Reset()
-    {
-        base.Reset();
-        
-        transform.TryFindObject(nameof(dr_variable_1), out dr_variable_1);
-        transform.TryFindObject(nameof(dr_operator), out dr_operator);
-        transform.TryFindObject(nameof(dr_variable_2), out dr_variable_2);
-    }
+    [SerializeField] private LogicExpressionPanel logicExpressionPrefab;
 
     private List<Variable> _allVariables;
     private List<Variable> _exposedVariables;
-    protected override void Start()
-    {
-        base.Start();
-        
-        dr_variable_1.onValueChanged.AddListener((value) =>
-        {
-            var selected = _allVariables[value];
-            UpdateVariableLists(selected.Type);
-        });
-    }
-    
-    private void UpdateVariableLists(VariableType type)
-    {
-        var variables = _exposedVariables.Where(v => v.Type == type).ToList();
-        dr_variable_2.Set(variables, new Variable());
-    }
-
+    [SerializeField] private Transform list;
+    private FlowChartManager _flowChartManager;
     protected override void SetUi()
     {
-        var flowChartManager = AppManager.GetManager<FlowChartManager>(); 
-        _allVariables = flowChartManager.ActiveVariables;
-        _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
-        
-        var variablesNames = _allVariables.Where(v=> v.Exposed).Select(v => v.Name).ToList();
-        dr_variable_1.options = variablesNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        dr_operator.options = OperatorHandler.LogicOperators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        
-        variablesNames.Insert(0, "New");
-        dr_variable_2.Set(_exposedVariables, new Variable());
-        
-        //set existing variable value
-        var logicCommand = (LogicCommand)Command;
-        if (_exposedVariables.Count > 0)
+        try
         {
-            var selected = string.IsNullOrEmpty(logicCommand.Variable1) ? flowChartManager.VariableMap[logicCommand.Variable1] : _exposedVariables[0];
-            UpdateVariableLists(selected.Type);
+            foreach (var e in GetComponentsInChildren<LogicExpressionPanel>())
+            {
+                Destroy(e.gameObject);
+            }
+            
+            _flowChartManager = AppManager.GetManager<FlowChartManager>();
+            _allVariables = _flowChartManager.ActiveVariables;
+            _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+            
+            //load old variables
+            var logicCommand = (LogicCommand)Command;
+            foreach (var expression in logicCommand.Expressions)
+            {
+                AddField(expression);
+            }
+            
+            if(list.childCount == 1) AddField(new LogicExpression());
         }
+        catch(Exception e)
+        {
+            Log.AddException(e);
+        }
+    }
+    
+    private void AddField(LogicExpression expression)
+    {
+        var logicExpressionPanel = Instantiate(logicExpressionPrefab, list);
+        logicExpressionPanel.Set(_exposedVariables, expression);
         
-        var v1 = flowChartManager.VariableMap[logicCommand.Variable1];
-        if(v1 != null) dr_variable_1.value = variablesNames.IndexOf(v1.Name);
-        
-        
+        logicExpressionPanel.onOperatorSelected.AddListener(value =>
+        {
+            if (value == 0)
+            {
+                var expressions = list.GetComponentsInChildren<LogicExpressionPanel>();
+                var index = Array.IndexOf(expressions, logicExpressionPanel);
+                if(index < expressions.Length - 1)
+                {
+                    for (var i = index + 1; i < expressions.Length; i++)
+                    {
+                        expressions[i].SetActive(false);
+                    }
+
+                    MessageUi.Show("Remaining expressions will be ignored");
+                }
+            }
+            else
+            {
+                var expressions = list.GetComponentsInChildren<LogicExpressionPanel>();
+                var index = Array.IndexOf(expressions, logicExpressionPanel);
+                for (var i = index + 1; i < expressions.Length; i++)
+                {
+                    expressions[i].SetActive(true);
+                }
+                
+                if(list.childCount == logicExpressionPanel.transform.GetSiblingIndex() + 1)
+                {
+                    AddField(new LogicExpression());
+                }
+            }
+        });
     }
 
     protected override void Apply()
@@ -74,26 +88,21 @@ public class LogicCommandUi : CommandUi
         }
 
         var logicCommand = (LogicCommand)Command;
-        var v1 = _allVariables[dr_variable_1.value];
+        logicCommand.Expressions.Clear();
 
-        var v2 = dr_variable_2.Value;
-        if (v2 == null)
+        for (var i = 0; i < list.childCount; i++)
         {
-            MessageUi.Show("Variable empty");
-            return;
+            var logicExpressionPanel = list.GetChild(i).GetComponent<LogicExpressionPanel>();
+            if (!logicExpressionPanel) continue;
+            
+            logicCommand.Expressions.Add(new LogicExpression()
+            {
+                Variable1 = _allVariables[logicExpressionPanel.dr_variable_1.value].ID,
+                Variable2 = logicExpressionPanel.dr_variable_2.Value.ID,
+                Operator = logicExpressionPanel.dr_operator.value > 0 ? OperatorHandler.LogicOperators[logicExpressionPanel.dr_operator.value] : "",
+                ConjunctionOperator = logicExpressionPanel.dr_next_logic_operator.value > 0 ? OperatorHandler.ConjunctionOperators[logicExpressionPanel.dr_next_logic_operator.value - 1] : "",
+            });
         }
-        
-        if(v2.Type == VariableType.Dynamic) v2.Type = v1.Type;
-        
-        if (!v2.IsValid())
-        {
-            MessageUi.Show("Variable doesn't match type");
-            return;
-        }
-        
-        logicCommand.Variable1 = _allVariables[dr_variable_1.value].ID;
-        logicCommand.Variable2 = dr_variable_2.Value.ID;
-        logicCommand.Operator = OperatorHandler.LogicOperators[dr_operator.value];
         
         base.Apply();
     }

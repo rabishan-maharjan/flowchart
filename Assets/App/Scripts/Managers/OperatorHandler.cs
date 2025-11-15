@@ -11,7 +11,12 @@ public static class OperatorHandler
 
     public static readonly string[] LogicOperators =
     {
-        "&&", "||", "==", "!=", "<", "<=", ">", ">="
+        "==", "!=", "<", "<=", ">", ">="
+    };
+    
+    public static readonly string[] ConjunctionOperators =
+    {
+        "or", "and"
     };
 
     public static bool Verify(string operatorName)
@@ -99,8 +104,6 @@ public static class OperatorHandler
             var b2 = (bool)v2.GetValue();
             return operatorName switch
             {
-                "&&" => b1 && b2,
-                "||" => b1 || b2,
                 "==" => b1 == b2,
                 "!=" => b1 != b2,
                 _ => throw new Exception($"Invalid boolean operator {operatorName}")

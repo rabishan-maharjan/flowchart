@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Arcube;
 
 public class Variable
 {
@@ -19,6 +21,12 @@ public class Variable
         Value = v.Value;
         Assigned = v.Assigned;
         Exposed = v.Exposed;
+    }
+
+    public static Variable TryGetVariable(string id)
+    {
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        return string.IsNullOrEmpty(id) ? null : flowChartManager.VariableMap.GetValueOrDefault(id);
     }
 
     /// <summary>

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public interface IGraph
 {
@@ -16,7 +16,7 @@ public interface IGraph
 public class OperationCommandUi : CommandUi
 {
     [SerializeField] private TMP_Dropdown dr_variable;
-    [FormerlySerializedAs("operatorExpressionPrefab")] [SerializeField] private OperatorExpressionPanel operatorExpressionPanelPrefab;
+    [SerializeField] private OperatorExpressionPanel operatorExpressionPanelPrefab;
     protected override void Reset()
     {
         transform.TryFindObject(nameof(dr_variable), out dr_variable);
@@ -25,10 +25,7 @@ public class OperationCommandUi : CommandUi
     }
 
     [SerializeField] private Transform list;
-    private void UpdateVariableLists(VariableType type)
-    {
-    }
-
+    
     private List<Variable> _allVariables;
     private List<Variable> _exposedVariables;
     private FlowChartManager _flowChartManager;
@@ -44,7 +41,6 @@ public class OperationCommandUi : CommandUi
         _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
         var variableNames = _exposedVariables.Select(variable => variable.Name).ToList();
         dr_variable.options = variableNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        variableNames.Insert(0, "New");
         
         //load old variables
         var operationCommand = (OperationCommand)Command;
@@ -54,11 +50,6 @@ public class OperationCommandUi : CommandUi
         }
         
         if(list.childCount == 1) AddField(new Expression());
-        
-        var selected = _exposedVariables[dr_variable.value];
-        UpdateVariableLists(selected.Type);
-        
-        base.SetUi();
     }
 
     private void AddField(Expression expression)
@@ -76,14 +67,27 @@ public class OperationCommandUi : CommandUi
             if (value == 0)
             {
                 //destroy next child
-                var nextChild = list.GetChild(transform.GetSiblingIndex() + 1);
-                if (nextChild)
+                var expressions = list.GetComponentsInChildren<OperatorExpressionPanel>();
+                var index = Array.IndexOf(expressions, operatorExpression);
+                if(index < expressions.Length - 1)
                 {
+                    for (var i = index + 1; i < expressions.Length; i++)
+                    {
+                        expressions[i].SetActive(false);
+                    }
+
                     MessageUi.Show("Remaining expressions will be ignored");
                 }
             }
             else
             {
+                var expressions = list.GetComponentsInChildren<OperatorExpressionPanel>();
+                var index = Array.IndexOf(expressions, operatorExpression);
+                for (var i = index + 1; i < expressions.Length; i++)
+                {
+                    expressions[i].SetActive(true);
+                }
+                
                 if(list.childCount == operatorExpression.transform.GetSiblingIndex() + 1)
                 {
                     AddField(new Expression());

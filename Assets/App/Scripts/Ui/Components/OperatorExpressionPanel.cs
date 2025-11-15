@@ -46,4 +46,10 @@ public class OperatorExpressionPanel : MonoBehaviour
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         if(!string.IsNullOrEmpty(operatorName)) dr_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.ArithmeticOperators, operatorName) + 1);
     }
+
+    public void SetActive(bool value)
+    {
+        dr_operator.interactable = value;
+        dr_variable.SetActive(value);
+    }
 }

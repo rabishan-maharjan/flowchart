@@ -70,7 +70,6 @@ public class DropDownWithInputField : MonoBehaviour
     {
         try
         {
-            Debug.Log("Setting to " + selected.Name);
             _variables = variables;
             var variableNames = _variables.Select(variable => variable.Name).ToList();
             variableNames.Insert(0, "New");
@@ -102,5 +101,11 @@ public class DropDownWithInputField : MonoBehaviour
         {
             Log.AddException(e);
         }
+    }
+
+    public void SetActive(bool value)
+    {
+        _dropdown.interactable = value;
+        ip_field.interactable = value;
     }
 }

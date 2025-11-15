@@ -54,7 +54,6 @@ public class ConnectorObject : GraphObject
     public void Clear()
     {
         NextNodeObject = null;
-        Debug.Log($"Clearing {name} child of {ParentNodeObject.name}", gameObject);
         if (NextNodeObject)
         {
             NextNodeObject.PrevConnectorObject = null;
