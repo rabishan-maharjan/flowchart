@@ -43,6 +43,7 @@ public class ConsoleUi : Ui
             AddText(value, true);
             _activeVariable.Value = value;
             ((Command)Function.ActiveNode).Completed = true;
+            ip_input.SetTextWithoutNotify("");
             ip_input.interactable = false;
         });
     }
@@ -53,6 +54,7 @@ public class ConsoleUi : Ui
         {
             Destroy(panel.gameObject);
         }
+        ip_input.SetTextWithoutNotify("");
         
         base.SetUi();
     }

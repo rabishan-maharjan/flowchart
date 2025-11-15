@@ -19,6 +19,11 @@ public static class OperatorHandler
 
     public static Variable OperateArithmetic(Variable v1, Variable v2, string operatorName)
     {
+        if (v1.Type != v2.Type)
+        {
+            throw new Exception($"Variables must be of the same type to perform arithmetic operation");
+        }
+        
         // ✅ String concatenation case
         if (v1.Type == VariableType.String || v2.Type == VariableType.String)
         {
@@ -38,8 +43,7 @@ public static class OperatorHandler
         // ✅ Numeric arithmetic case
         var val1 = Convert.ToSingle(v1.GetValue());
         var val2 = Convert.ToSingle(v2.GetValue());
-        float result = 0f;
-
+        float result;
         switch (operatorName)
         {
             case "+": result = val1 + val2; break;
@@ -57,11 +61,10 @@ public static class OperatorHandler
                 throw new Exception($"Unknown arithmetic operator: {operatorName}");
         }
 
-        bool bothInt = v1.Type == VariableType.Int && v2.Type == VariableType.Int;
         return new Variable
         {
-            Type = bothInt ? VariableType.Int : VariableType.Float,
-            Value = bothInt ? ((int)result).ToString() : result.ToString(CultureInfo.InvariantCulture),
+            Type = VariableType.Number,
+            Value = result.ToString(CultureInfo.InvariantCulture),
             Assigned = true
         };
     }
@@ -70,8 +73,8 @@ public static class OperatorHandler
     public static bool OperateLogic(Variable v1, Variable v2, string operatorName)
     {
         // Convert both to float if numeric
-        var v1IsNumber = v1.Type == VariableType.Int || v1.Type == VariableType.Float;
-        var v2IsNumber = v2.Type == VariableType.Int || v2.Type == VariableType.Float;
+        var v1IsNumber = v1.Type == VariableType.Number;
+        var v2IsNumber = v2.Type == VariableType.Number;
 
         if (v1IsNumber && v2IsNumber)
         {
@@ -90,7 +93,7 @@ public static class OperatorHandler
         }
 
         // Handle booleans
-        if (v1.Type == VariableType.Boolean && v2.Type == VariableType.Boolean)
+        if (v1.Type == VariableType.Bool && v2.Type == VariableType.Bool)
         {
             var b1 = (bool)v1.GetValue();
             var b2 = (bool)v2.GetValue();

@@ -18,7 +18,16 @@ public class OutputCommand : Command
         foreach (var variable in Variables)
         {
             var v = AppManager.GetManager<FlowChartManager>().VariableMap[variable];
-            Output += v.Value;
+            if (v.Type == VariableType.Number)
+            {
+                // round to two decimals and remove unnecessary zeros
+                var num = float.Parse(v.Value);
+                Output += num.ToString("0.##");   // "0.##" removes trailing zeros
+            }
+            else
+            {
+                Output += v.Value;
+            }
         }
         
         Function.OnOutput.Invoke(Output);

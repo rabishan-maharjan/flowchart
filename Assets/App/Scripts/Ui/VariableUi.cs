@@ -10,9 +10,8 @@ public enum VariableType
 {
     Dynamic,
     String,
-    Boolean,
-    Int,
-    Float,
+    Bool,
+    Number,
 }
 
 public class VariableUi : Ui
@@ -32,21 +31,17 @@ public class VariableUi : Ui
         {
             var type = (VariableType)value; 
             
-            tb_value.gameObject.SetActive(type == VariableType.Boolean);
-            ip_value.gameObject.SetActive(type != VariableType.Boolean);
+            tb_value.gameObject.SetActive(type == VariableType.Bool);
+            ip_value.gameObject.SetActive(type != VariableType.Bool);
             
             switch (type)
             {
-                case VariableType.Boolean:
+                case VariableType.Bool:
                     tb_value.IsOn = false;
                     break;
-                case VariableType.Float:
+                case VariableType.Number:
                     ip_value.Text = "0";
                     ip_value.ContentType = TMP_InputField.ContentType.DecimalNumber;
-                    break;
-                case VariableType.Int:
-                    ip_value.Text = "0";
-                    ip_value.ContentType = TMP_InputField.ContentType.IntegerNumber;
                     break;
                 case VariableType.String:
                     ip_value.ContentType = TMP_InputField.ContentType.Standard;
@@ -87,7 +82,7 @@ public class VariableUi : Ui
         dr_type.RefreshShownValue();
             
         ip_name.Text = variable.Name;
-        var isBoolean = variable.Type == VariableType.Boolean;
+        var isBoolean = variable.Type == VariableType.Bool;
         
         tb_value.gameObject.SetActive(isBoolean);
         ip_value.gameObject.SetActive(!isBoolean);
@@ -118,7 +113,7 @@ public class VariableUi : Ui
             _variable.Type = Variable.DetectType(ip_value.Text);
         }
         
-        if(_variable.Type != VariableType.Boolean) _variable.Value = ip_value.Text;
+        if(_variable.Type != VariableType.Bool) _variable.Value = ip_value.Text;
         else _variable.Value = tb_value ? "true" : "false";
         
         _variable.Assigned = true;

@@ -64,7 +64,7 @@ public class OperationCommandUi : CommandUi
     private void AddField(Expression expression)
     {
         var selected = _exposedVariables[dr_variable.value];
-        var variables = _exposedVariables.Where(v => v.Type == selected.Type).ToList();
+        var variables = _exposedVariables.Where(v => v.Type == selected.Type && v.Type != VariableType.Bool).ToList();
         var operatorExpression = Instantiate(operatorExpressionPanelPrefab, list);
         
         var v = new Variable();
@@ -107,6 +107,8 @@ public class OperationCommandUi : CommandUi
         for (var i = 0; i < list.childCount; i++)
         {
             var operatorExpression = list.GetChild(i).GetComponent<OperatorExpressionPanel>();
+            if (!operatorExpression) continue;
+            
             var ve = operatorExpression.dr_variable.Value;
             ve.Type = Variable.DetectType(ve.Value);
             if (ve.Type != v.Type)

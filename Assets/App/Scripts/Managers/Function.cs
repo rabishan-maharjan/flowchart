@@ -14,27 +14,40 @@ public class Function
     public static Node ActiveNode { get; private set; }
     public async void Execute()
     {
+        var backup = Variables.ConvertAll(v => new Variable(v));
         try
         {
             var nodeId = Nodes.Find(x => x is StartNode).NextNode;
-            if(string.IsNullOrEmpty(nodeId)) return;
-            var node = Nodes.Find(x => x.ID == nodeId);
-            while(node is not EndNode)
+            if (string.IsNullOrEmpty(nodeId)) return;
+            ActiveNode = Nodes.Find(x => x.ID == nodeId);
+            while (ActiveNode is not EndNode)
             {
-                Debug.Log($"Executing {node.Name}");
-                
-                var command = (Command)node;
-                if (command is InputCommand inputCommand) {OnInput?.Invoke(inputCommand.Variable);}
+                Debug.Log($"Executing {ActiveNode.Name}");
+
+                var command = (Command)ActiveNode;
+                if (command is InputCommand inputCommand)
+                {
+                    OnInput?.Invoke(inputCommand.Variable);
+                }
+
                 await command.Execute();
                 nodeId = command.NextNode;
-                if(string.IsNullOrEmpty(nodeId)) break; 
-                node = Nodes.Find(x => x.ID == nodeId);
+                if (string.IsNullOrEmpty(nodeId)) break;
+                ActiveNode = Nodes.Find(x => x.ID == nodeId);
             }
         }
         catch (Exception e)
         {
             OnError?.Invoke(e.Message);
             Log.AddException(e);
+        }
+        finally
+        {
+            for (int i = 0; i < Variables.Count; i++)
+            {
+                Variables[i].Value = backup[i].Value;
+                Variables[i].Assigned = backup[i].Assigned;
+            }
         }
     }
 }

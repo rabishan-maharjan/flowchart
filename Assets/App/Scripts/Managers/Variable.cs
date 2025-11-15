@@ -29,9 +29,8 @@ public class Variable
         Type switch
         {
             VariableType.String => true,
-            VariableType.Boolean => bool.TryParse(Value, out _),
-            VariableType.Int => int.TryParse(Value, out _),
-            VariableType.Float => float.TryParse(Value, out _),
+            VariableType.Bool => bool.TryParse(Value, out _),
+            VariableType.Number => float.TryParse(Value, out _),
             _ => false
         };
 
@@ -39,17 +38,15 @@ public class Variable
         Type switch
         {
             VariableType.String => Value,
-            VariableType.Boolean => bool.Parse(Value),
-            VariableType.Int => int.Parse(Value),
-            VariableType.Float => float.Parse(Value),
+            VariableType.Bool => bool.Parse(Value),
+            VariableType.Number => float.Parse(Value),
             _ => throw new Exception("Invalid variable type")
         };
 
     public static VariableType DetectType(string value)
     {
-        if (bool.TryParse(value, out _)) return VariableType.Boolean;
-        if (int.TryParse(value, out _)) return VariableType.Int;
-        if (float.TryParse(value, out _)) return VariableType.Float;
+        if (bool.TryParse(value, out _)) return VariableType.Bool;
+        if (float.TryParse(value, out _)) return VariableType.Number;
         return VariableType.String;
     }
 }
