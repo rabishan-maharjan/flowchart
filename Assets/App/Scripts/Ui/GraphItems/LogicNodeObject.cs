@@ -72,9 +72,4 @@ public class LogicNodeObject : CommandObject
         
         base.GenerateCode(flowChartManager);
     }
-
-    private void CloseNode()
-    {
-        
-    }
 }

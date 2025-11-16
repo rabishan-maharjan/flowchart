@@ -84,6 +84,7 @@ MonoBehaviour:
   dr_operator: {fileID: 2228942414286968470}
   dr_variable_2: {fileID: 4613232386867773306}
   dr_next_logic_operator: {fileID: 3521674963924254987}
+  b_delete: {fileID: 5538228791252572404}
   onOperatorSelected:
     m_PersistentCalls:
       m_Calls: []

@@ -6,7 +6,6 @@ using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 public class LogicExpressionPanel : Panel
 {
@@ -14,11 +13,14 @@ public class LogicExpressionPanel : Panel
     [SerializeField] public TMP_Dropdown dr_operator;
     [SerializeField] public DropDownWithInputField dr_variable_2;
     [SerializeField] public TMP_Dropdown dr_next_logic_operator;
+    [SerializeField] private ButtonImage b_delete;
     private void Reset()
     {
         transform.TryFindObject(nameof(dr_variable_1), out dr_variable_1);
         transform.TryFindObject(nameof(dr_operator), out dr_operator);
         transform.TryFindObject(nameof(dr_variable_2), out dr_variable_2);
+        transform.TryFindObject(nameof(dr_next_logic_operator), out dr_next_logic_operator);
+        transform.TryFindObject(nameof(b_delete), out b_delete);
     }
 
     public UnityEvent<int> onOperatorSelected;
@@ -29,7 +31,7 @@ public class LogicExpressionPanel : Panel
             onOperatorSelected.Invoke(value);
         });
         
-        gameObject.FindObject<ButtonImage>("b_delete").OnClick.AddListener(() =>
+        b_delete.OnClick.AddListener(() =>
         {
             if (transform.parent.childCount == 1)
             {
@@ -48,7 +50,7 @@ public class LogicExpressionPanel : Panel
         var v1 = Variable.TryGetVariable(expression.Variable1);
         if(v1 != null) dr_variable_1.SetValueWithoutNotify(allVariables.IndexOf(v1));
         
-        var v2 = Variable.TryGetVariable(expression.Variable1);
+        var v2 = Variable.TryGetVariable(expression.Variable2);
         if(v2 != null) dr_variable_2.Set(allVariables, v2);
         
         var operators = new List<string>(OperatorHandler.LogicOperators);

@@ -121,6 +121,8 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
     public void CloseNode(ConnectorObject branchConnectorObject)
     {
+        if(this is EndNodeObject) return;
+        
         var dynamicLineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
         if (!dynamicLineDrawer)
         {

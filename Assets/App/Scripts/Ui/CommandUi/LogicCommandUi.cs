@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
@@ -14,7 +15,7 @@ public class LogicCommandUi : CommandUi
     private List<Variable> _exposedVariables;
     [SerializeField] private Transform list;
     private FlowChartManager _flowChartManager;
-    protected override void SetUi()
+    protected override async void SetUi()
     {
         try
         {
@@ -22,6 +23,8 @@ public class LogicCommandUi : CommandUi
             {
                 Destroy(e.gameObject);
             }
+            
+            await Task.Yield();
             
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;
@@ -98,11 +101,26 @@ public class LogicCommandUi : CommandUi
             var logicExpressionPanel = list.GetChild(i).GetComponent<LogicExpressionPanel>();
             if (!logicExpressionPanel) continue;
             
+            var v1 = Variable.TryGetVariable(_allVariables[logicExpressionPanel.dr_variable_1.value].ID);
+            var v2 = logicExpressionPanel.dr_variable_2.Value;
+
+            var type1 = Variable.DetectType(v1.Value);
+            var type2 = Variable.DetectType(v2.Value);
+            
+            v1.Type = type1;
+            v2.Type = type2;
+            
+            if (v1.Type != v2.Type)
+            {
+                MessageUi.Show("Variable type mismatch");
+                return;
+            }
+            
             logicCommand.Expressions.Add(new LogicExpression()
             {
-                Variable1 = _allVariables[logicExpressionPanel.dr_variable_1.value].ID,
-                Variable2 = logicExpressionPanel.dr_variable_2.Value.ID,
-                Operator = logicExpressionPanel.dr_operator.value > 0 ? OperatorHandler.LogicOperators[logicExpressionPanel.dr_operator.value] : "",
+                Variable1 = v1.ID,
+                Variable2 = v2.ID,
+                Operator = OperatorHandler.LogicOperators[logicExpressionPanel.dr_operator.value],
                 ConjunctionOperator = logicExpressionPanel.dr_next_logic_operator.value > 0 ? OperatorHandler.ConjunctionOperators[logicExpressionPanel.dr_next_logic_operator.value - 1] : "",
             });
         }

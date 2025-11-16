@@ -33,6 +33,8 @@ public class VariableListPanel : MonoBehaviour
     
     public void CreateVariable(Variable variable)
     {
+        if(!variable.Exposed) return;
+        
         var panel = _listContainer.CreateItem<VariableItemPanel>();
         panel.Set(variable);
         var siblingIndex = panel.transform.GetSiblingIndex();

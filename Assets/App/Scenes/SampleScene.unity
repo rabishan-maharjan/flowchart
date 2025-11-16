@@ -10136,6 +10136,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   closable: 0
   deactivateOnClose: 0
+  variableListPanel: {fileID: 1104658780}
 --- !u!1 &1484388971
 GameObject:
   m_ObjectHideFlags: 0

@@ -20,3 +20,4 @@ mono_crash.*
 .idea/
 *.user
 Assets/GeneratedLocalRepo/
+Assets/_Recovery/

@@ -82,7 +82,7 @@ public class LogicCommand : Command
             var v1 = flowChartManager.VariableMap[expression.Variable1];
             var v2 = flowChartManager.VariableMap[expression.Variable2];
 
-            output += $"{v1.Name} {expression.Operator} {v2.Name} \n";    
+            output += $"{v1.Name} {expression.Operator} {v2.Name} \n";
         }
 
         return output;

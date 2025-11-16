@@ -43,6 +43,11 @@ public class Function
         }
         finally
         {
+            foreach (var node in Nodes)
+            {
+                if (node is Command command) command.Completed = false;
+            }
+            
             for (int i = 0; i < Variables.Count; i++)
             {
                 Variables[i].Value = backup[i].Value;
