@@ -122,7 +122,7 @@ public class GraphPanelUi : Ui
         {
             nodeObject.Delete(true);
         }
-
+        
         var nodesObjects = new List<NodeObject>();
         foreach (var function in functions)
         {
@@ -176,16 +176,19 @@ public class GraphPanelUi : Ui
                         }
                     }
                 }
-                else if (node is LoopCommand loopCommand && loopCommand.NextNode != null)
+                else if (node is LoopCommand loopCommand)
                 {
-                    var nextNodeObject = nodesObjects.Find(x => x.Node.ID == loopCommand.NextNode);
-                    if (nextNodeObject)
+                    if (loopCommand.NodeLoop != null)
                     {
-                        ((LoopNodeObject)nodeObject).ConnectorObject.Connect(nextNodeObject);
-                    }
-                    else
-                    {
-                        Debug.Log($"Next node not found {loopCommand.NextNode}");
+                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == loopCommand.NodeLoop);
+                        if (nextNodeObject)
+                        {
+                            ((LoopNodeObject)nodeObject).ConnectorLoopObject.Connect(nextNodeObject);
+                        }
+                        else
+                        {
+                            Debug.Log($"Next node not found {loopCommand.NodeLoop}");
+                        }
                     }
                 }
             }

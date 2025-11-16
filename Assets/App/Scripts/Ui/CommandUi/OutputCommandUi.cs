@@ -2,6 +2,7 @@
 using System.Linq;
 using Arcube;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OutputCommandUi : CommandUi
 {
@@ -54,6 +55,8 @@ public class OutputCommandUi : CommandUi
         }
 
         variableSelector.onValueChanged.AddListener(HandleValueSelected);
+            
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)list.transform);
     }
 
     protected override void Apply()

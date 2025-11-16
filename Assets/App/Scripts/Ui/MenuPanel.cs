@@ -61,6 +61,15 @@ public class MenuPanel : MonoBehaviour
             //show filename load ui
             var fileName = "test.flw";
             var code = _flowChartManager.Functions = _ioManager.Load(fileName);
+            foreach (var function in code)
+            {
+                foreach (var variable in function.Value.Variables)
+                {
+                    _flowChartManager.AddVariable(variable);
+                    UiManager.GetUi<AppUi>().variableListPanel.CreateVariable(variable);
+                }
+            }
+            
             await UiManager.GetUi<GraphPanelUi>().GenerateFlowChart(code);
         }
         catch(Exception e)

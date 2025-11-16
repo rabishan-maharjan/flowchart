@@ -794,6 +794,10 @@ PrefabInstance:
       value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
+      propertyPath: branchNode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: <ParentNodeObject>k__BackingField
       value: 
       objectReference: {fileID: 8335222252332560191}

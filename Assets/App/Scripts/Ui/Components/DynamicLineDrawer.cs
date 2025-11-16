@@ -10,8 +10,10 @@ public class DynamicLineDrawer : MonoBehaviour
     private Vector3 _previousStartPosition; // Previous position of StartNode->Connector
     private Vector3 _previousEndPosition; // Previous position of EndNode
     private GraphSettings _graphSettings;
+    private bool _set = false;
     public async Task Set(RectTransform endNote)
     {
+        _set = true;
         _endNode = endNote;
         _startNodeConnector = (RectTransform)transform.GetChild(0);
         
@@ -38,6 +40,8 @@ public class DynamicLineDrawer : MonoBehaviour
 
     private void Update()
     {
+        if(!_set) return;
+        
         // Update the line and arrow only if positions have changed
         if (_startNodeConnector.position == _previousStartPosition && _endNode.position == _previousEndPosition) return;
         UpdateLineAndArrow();
@@ -55,7 +59,8 @@ public class DynamicLineDrawer : MonoBehaviour
 
         // Calculate the slope
         var direction = endPosition - startPosition;
-        var slope = Mathf.Abs(direction.y / direction.x);
+        var slope = Mathf.Abs(direction.x) < 0.0001f ? float.PositiveInfinity : // vertical line
+            Mathf.Abs(direction.y / direction.x);
 
         if (Mathf.Approximately(slope, 0)) // Check if slope is exactly 0 (horizontal line)
         {
@@ -112,6 +117,12 @@ public class DynamicLineDrawer : MonoBehaviour
     private void OnDestroy()
     {
         Destroy(_lineRenderer);
-        Destroy(_arrow.gameObject);
+        if(_arrow) Destroy(_arrow.gameObject);
+    }
+
+    public void Clear()
+    {
+        _set = false;
+        if(_lineRenderer) _lineRenderer.positionCount = 0;
     }
 }

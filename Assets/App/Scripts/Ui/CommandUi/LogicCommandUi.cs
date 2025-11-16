@@ -4,6 +4,7 @@ using System.Linq;
 using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LogicCommandUi : CommandUi
 {
@@ -77,6 +78,8 @@ public class LogicCommandUi : CommandUi
                 }
             }
         });
+        
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)list.transform);
     }
 
     protected override void Apply()

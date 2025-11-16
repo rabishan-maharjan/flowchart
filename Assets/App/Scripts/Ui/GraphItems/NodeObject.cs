@@ -76,24 +76,15 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     {
         if (GraphPanelUi.Selected is ConnectorObject connectorObject)
         {
-            if (CanConnect(connectorObject)) connectorObject.Connect(this);
+            if (CanConnect(connectorObject))
+            {
+                connectorObject.Connect(this);
+            }
         }
 
         base.Select();
     }
-
-    public override void Delete(bool force)
-    {
-        if (!force && GraphPanelUi.Selected != this) return;
-        GraphPanelUi.Selected = null;
-
-        //delete lines from previous connector
-        PrevConnectorObject?.Clear();
-        
-        ConnectorObject?.Clear();
-        base.Delete(force);
-    }
-
+    
     //connection from connector object to node
     protected virtual bool CanConnect(ConnectorObject connectorObject)
     {
@@ -127,7 +118,30 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
         return true;
     }
-    
+
+    public void CloseNode(ConnectorObject branchConnectorObject)
+    {
+        var dynamicLineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
+        if (!dynamicLineDrawer)
+        {
+            dynamicLineDrawer = ConnectorObject.gameObject.AddComponent<DynamicLineDrawer>();
+        }
+        
+        _ = dynamicLineDrawer.Set(branchConnectorObject.transform.GetChild(0) as RectTransform);
+    }
+
+    public override void Delete(bool force)
+    {
+        if (!force && GraphPanelUi.Selected != this) return;
+        GraphPanelUi.Selected = null;
+
+        //delete lines from previous connector
+        PrevConnectorObject?.Clear();
+        
+        ConnectorObject?.Clear();
+        base.Delete(force);
+    }
+
     public virtual void GenerateCode(FlowChartManager flowChartManager)
     {
         if (ConnectorObject && ConnectorObject.NextNodeObject)

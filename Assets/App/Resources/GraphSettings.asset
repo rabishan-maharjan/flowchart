@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: GraphSettings
   m_EditorClassIdentifier: Assembly-CSharp::GraphSettings
   lineWidth: 8
-  slopeThreshold: 55
+  slopeThreshold: 65
   lineMaterial: {fileID: 2100000, guid: 9cb9bf9766cca9341aecd1e40f7894b3, type: 2}
   arrowPrefab: {fileID: 845228942616654992, guid: 4b4b11579efa0044e8fd49207afcbc01, type: 3}
-  graphItemColors: {fileID: 0}
   colors:
     _serializedList:
     - Key: StartNode

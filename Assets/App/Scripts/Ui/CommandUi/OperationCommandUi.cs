@@ -5,6 +5,7 @@ using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface IGraph
 {
@@ -94,6 +95,8 @@ public class OperationCommandUi : CommandUi
                 }
             }
         });
+        
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)list.transform);
     }
 
     protected override void Apply()

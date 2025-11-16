@@ -9,6 +9,7 @@ public enum NodeType
 
 public class ConnectorObject : GraphObject
 {
+    [SerializeField] private bool branchNode = false;
     [SerializeField] private NodeType nodeType = NodeType.Flow;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
     public NodeObject NextNodeObject { get; private set; }
@@ -49,6 +50,28 @@ public class ConnectorObject : GraphObject
         } 
         
         _ = lineDrawer.Set((RectTransform)nodeObject.transform);
+
+        var branchConnector = GetBranchConnector();
+        if (branchConnector)
+        {
+            NextNodeObject.CloseNode(branchConnector);
+        }
+    }
+
+    private ConnectorObject GetBranchConnector()
+    {
+        var prevConnectorObject = this;
+        while (prevConnectorObject)
+        {
+            if (prevConnectorObject.branchNode)
+            {
+                return prevConnectorObject;
+            }
+
+            prevConnectorObject = prevConnectorObject.ParentNodeObject.PrevConnectorObject;
+        }
+
+        return null;
     }
     
     public void Clear()
