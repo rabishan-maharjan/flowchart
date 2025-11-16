@@ -40,7 +40,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 5, y: 20}
+  m_SizeDelta: {x: 2, y: 20}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5150567204890554120
 CanvasRenderer:
@@ -153,9 +153,9 @@ MonoBehaviour:
   button: {fileID: 597610480462742489}
   <Image>k__BackingField: {fileID: 6865528367503382816}
   _text: {fileID: 0}
-  id: 0
+  branchNode: 0
+  nodeType: 1
   <ParentNodeObject>k__BackingField: {fileID: 0}
-  offset: {x: 0, y: 55}
 --- !u!114 &7490362350462395367
 MonoBehaviour:
   m_ObjectHideFlags: 0

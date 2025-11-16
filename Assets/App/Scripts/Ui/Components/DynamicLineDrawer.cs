@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class DynamicLineDrawer : MonoBehaviour
 {
+    [SerializeField] private bool drawArrow = true;
     private RectTransform _startNodeConnector; // Reference to StartNode->Connector
     private RectTransform _endNode; // Reference to EndNode
     private LineRenderer _lineRenderer; // Single LineRenderer
@@ -26,7 +27,7 @@ public class DynamicLineDrawer : MonoBehaviour
             _lineRenderer.startWidth = _graphSettings.lineWidth;
             _lineRenderer.endWidth = _graphSettings.lineWidth;
             _lineRenderer.useWorldSpace = true;
-            _arrow = Instantiate(_graphSettings.arrowPrefab, transform);
+            if(drawArrow) _arrow = Instantiate(_graphSettings.arrowPrefab, transform);
         }
 
         // Initialize previous positions
@@ -51,7 +52,7 @@ public class DynamicLineDrawer : MonoBehaviour
 
     private void UpdateLineAndArrow()
     {
-        if (!_startNodeConnector || !_endNode || !_lineRenderer || !_arrow) return;
+        if (!_startNodeConnector || !_endNode || !_lineRenderer) return;
 
         // Get positions in world space
         var startPosition = _startNodeConnector.position;
@@ -89,7 +90,7 @@ public class DynamicLineDrawer : MonoBehaviour
         }
 
         // Update arrow position and rotation based on the last segment of the line
-        UpdateArrow();
+        if(drawArrow) UpdateArrow();
     }
 
     private void UpdateArrow()

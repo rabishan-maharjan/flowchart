@@ -40,4 +40,9 @@ public class VariableListPanel : MonoBehaviour
         var siblingIndex = panel.transform.GetSiblingIndex();
         panel.transform.SetSiblingIndex(siblingIndex - 1);
     }
+
+    public void Clear()
+    {
+        _listContainer.ClearList();
+    }
 }

@@ -41,9 +41,29 @@ public class LoopNodeObject : CommandObject
             if (nextNode != null)
             {
                 loopCommand.NodeLoop = nextNode.ID;
-            }    
+            }
         }
 
         base.GenerateCode(flowChartManager);
+    }
+
+    [SerializeField] private DynamicLineDrawer pivot;
+    private void Start()
+    {
+        _= pivot.Set((RectTransform)ConnectorObject.transform);
+    }
+    private void Update()
+    {
+        var connector = ConnectorLoopObject;
+        while (connector)
+        {
+            if (connector.NextNodeObject) connector = connector.NextNodeObject.ConnectorObject;
+            else break;
+        }
+
+        if(!connector || connector == ConnectorLoopObject) return;
+        
+        var brt = connector.transform;
+        ConnectorObject.transform.position = new Vector3(transform.position.x, brt.transform.position.y - 50);
     }
 }

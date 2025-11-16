@@ -18,6 +18,7 @@ public class MenuPanel : MonoBehaviour
         gameObject.FindObject<ButtonImage>("b_new").OnClick.AddListener(() =>
         {
             _flowChartManager.New();
+            UiManager.GetUi<AppUi>().variableListPanel.Clear();
         });
         
         gameObject.FindObject<ButtonImage>("b_open").OnClick.AddListener(Load);

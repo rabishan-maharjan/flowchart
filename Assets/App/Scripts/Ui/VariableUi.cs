@@ -100,7 +100,7 @@ public class VariableUi : Ui
         }
 
         var flowchartManager = AppManager.GetManager<FlowChartManager>();
-        if (flowchartManager.ActiveVariables.FirstOrDefault(v => v.Name == ip_name.Text) != null)
+        if (flowchartManager.ActiveVariables.FirstOrDefault(v => v.Name == ip_name.Text && v.ID != _variable.ID) != null)
         {
             MessageUi.Show("Name is already used");
             return;

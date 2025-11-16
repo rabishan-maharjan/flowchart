@@ -104,6 +104,12 @@ public class LogicCommandUi : CommandUi
             var v1 = Variable.TryGetVariable(_allVariables[logicExpressionPanel.dr_variable_1.value].ID);
             var v2 = logicExpressionPanel.dr_variable_2.Value;
 
+            if (v1 == null || v2 == null)
+            {
+                MessageUi.Show("Invalid variable");
+                return;
+            }
+
             var type1 = Variable.DetectType(v1.Value);
             var type2 = Variable.DetectType(v2.Value);
             

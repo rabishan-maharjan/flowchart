@@ -38,6 +38,12 @@ public class OutputCommand : Command
 
     public override string GetDescription()
     {
-        return "Output";
+        var output = "Output\n";
+        foreach (var variable in Variables)
+        {
+            output += Variable.TryGetVariable(variable)?.Name;
+        }
+        
+        return output;
     }
 }

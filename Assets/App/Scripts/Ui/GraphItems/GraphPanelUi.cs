@@ -45,7 +45,7 @@ public class GraphPanelUi : Ui
     public static GraphObject Selected { get; set; }
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Delete))
+        if (Input.GetKey(KeyCode.Delete) || Input.GetKey(KeyCode.Backspace))
         {
             Selected?.Delete(false);
         }

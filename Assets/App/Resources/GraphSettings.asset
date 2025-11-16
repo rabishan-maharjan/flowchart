@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0513984ceef8424a8302b88e84ae80b6, type: 3}
   m_Name: GraphSettings
   m_EditorClassIdentifier: Assembly-CSharp::GraphSettings
-  lineWidth: 8
+  lineWidth: 5
   slopeThreshold: 65
   lineMaterial: {fileID: 2100000, guid: 9cb9bf9766cca9341aecd1e40f7894b3, type: 2}
   arrowPrefab: {fileID: 845228942616654992, guid: 4b4b11579efa0044e8fd49207afcbc01, type: 3}

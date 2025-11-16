@@ -29,8 +29,6 @@ public class ConnectorObject : GraphObject
 
     public void Connect(NodeObject nodeObject)
     {
-        Debug.Log($"Connecting {name} with {nodeObject.name}");
-        
         if (NextNodeObject)
         {
             NextNodeObject.PrevConnectorObject = null;
@@ -65,7 +63,7 @@ public class ConnectorObject : GraphObject
         {
             if (prevConnectorObject.branchNode)
             {
-                return prevConnectorObject;
+                return prevConnectorObject.ParentNodeObject is LogicNodeObject ? prevConnectorObject.ParentNodeObject.ConnectorObject : prevConnectorObject;
             }
 
             prevConnectorObject = prevConnectorObject.ParentNodeObject.PrevConnectorObject;
