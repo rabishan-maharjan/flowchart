@@ -32,6 +32,7 @@ public class ConsoleUi : Ui
         {
             _activeVariable = AppManager.GetManager<FlowChartManager>().VariableMap[value];
             ip_input.interactable = true;
+            ip_input.Select();
         };
 
         Function.OnError += AddError;

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
@@ -8,6 +9,8 @@ public class MenuPanel : MonoBehaviour
 {
     private FlowChartManager _flowChartManager;
     private IOManager _ioManager;
+    private const string Root = "Projects";
+    private const string Ext = "flw";
     private void Start()
     {
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
@@ -18,26 +21,15 @@ public class MenuPanel : MonoBehaviour
         gameObject.FindObject<ButtonImage>("b_new").OnClick.AddListener(() =>
         {
             _flowChartManager.New();
+            _ioManager.New();
             UiManager.GetUi<AppUi>().variableListPanel.Clear();
         });
         
         gameObject.FindObject<ButtonImage>("b_open").OnClick.AddListener(Load);
         
-        gameObject.FindObject<ButtonImage>("b_save").OnClick.AddListener(() =>
-        {
-            //show filename save ui
-            var fileName = "test.flw";
-            UiManager.GetUi<GraphPanelUi>().GenerateCode();
-            _ioManager.Save(fileName, _flowChartManager.Functions);
-        });
+        gameObject.FindObject<ButtonImage>("b_save").OnClick.AddListener(Save);
         
-        gameObject.FindObject<ButtonImage>("b_save_as").OnClick.AddListener(() =>
-        {
-            //show filename save ui
-            var fileName = "test.flw";
-            UiManager.GetUi<GraphPanelUi>().GenerateCode();
-            _ioManager.Save(fileName, _flowChartManager.Functions);
-        });
+        gameObject.FindObject<ButtonImage>("b_save_as").OnClick.AddListener(SaveAs);
     }
 
     private async void Compile()
@@ -54,14 +46,54 @@ public class MenuPanel : MonoBehaviour
             Log.AddException(e);
         }
     }
+    
+    
+    private void Save()
+    {
+        try
+        {
+            var fileName = _ioManager.CurrentFile;
+            if (string.IsNullOrEmpty(_ioManager.CurrentFile))
+            {
+                SaveAs();
+                return;
+            }
+            
+            UiManager.GetUi<GraphPanelUi>().GenerateCode();
+            _ioManager.Save(fileName, _flowChartManager.Functions);
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
+    }
+    
+    private async void SaveAs()
+    {
+        try
+        {
+            var path = Path.Combine(Application.persistentDataPath, Root);
+            var fileName = await FileBrowser.Instance.OpenSave(path, Ext);
+            if(string.IsNullOrEmpty(fileName)) return;
+            
+            UiManager.GetUi<GraphPanelUi>().GenerateCode();
+            _ioManager.Save($"{fileName}.{Ext}", _flowChartManager.Functions);
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
+    }
 
     private async void Load()
     {
         try
         {
-            //show filename load ui
-            var fileName = "test.flw";
-            var code = _flowChartManager.Functions = _ioManager.Load(fileName);
+            var path = Path.Combine(Application.persistentDataPath, Root);
+            var fileName = await FileBrowser.Instance.OpenLoad(path, Ext);
+            if(string.IsNullOrEmpty(fileName)) return;
+            
+            var code = _flowChartManager.Functions = _ioManager.Load($"{fileName}.{Ext}");
             foreach (var function in code)
             {
                 foreach (var variable in function.Value.Variables)

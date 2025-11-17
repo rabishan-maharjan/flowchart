@@ -36,8 +36,7 @@ namespace Arcube.UiManagement
 
         public bool isStatic = true;
         protected bool Initialized;
-        public List<PanelItem> Objects { get; private set; } = new();
-
+        protected List<PanelItem> Objects { get; private set; } = new();
         protected override void SetUi()
         {
             if (isStatic && Initialized) return;
@@ -62,12 +61,18 @@ namespace Arcube.UiManagement
 
         public void ClearList()
         {
+            if (highlight)
+            {
+                highlight.SetParent(transform);
+                highlight.gameObject.SetActive(false);
+            }
+
             for (var index = Objects.Count - 1; index >= 0; index--)
             {
                 var item = Objects[index];
                 Destroy(item.gameObject);
             }
-
+            
             Objects.Clear();
         }
 
@@ -87,6 +92,7 @@ namespace Arcube.UiManagement
             if (!highlight) return;
             highlight.SetParent(panel.transform);
             highlight.SetSiblingIndex(0);
+            highlight.gameObject.SetActive(true);
             var rt = (RectTransform)highlight;
             rt.sizeDelta = Vector2.zero;
             rt.anchoredPosition = Vector2.zero;

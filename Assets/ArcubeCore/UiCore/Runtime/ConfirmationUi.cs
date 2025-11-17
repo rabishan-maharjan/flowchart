@@ -74,7 +74,6 @@ namespace Arcube.UiManagement
 
                 var b_deny = _instance.b_deny;
                 b_deny.OnClick.RemoveAllListeners();
-
                 b_deny.gameObject.SetActive(true);
                 b_deny.OnClick.AddListener(() =>
                 {
