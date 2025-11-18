@@ -133,6 +133,6 @@ public class DynamicLineDrawer : MonoBehaviour
         Destroy(_lineRenderer);
         if(_arrow) Destroy(_arrow.gameObject);
         
-        Debug.LogWarning($"Destroying line drawer {name} {Time.time}", gameObject);
+        //Debug.LogWarning($"Destroying line drawer {name} {Time.time}", gameObject);
     }
 }

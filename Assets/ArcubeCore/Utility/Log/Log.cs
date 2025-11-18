@@ -19,7 +19,7 @@ namespace Arcube
 
         private void Awake() => Instance = this;
 
-        public static void Add(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void Add(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -40,7 +40,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddTest(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void AddTest(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -60,7 +60,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddPriority(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void AddPriority(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -80,7 +80,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddHighlight(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void AddHighlight(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -102,7 +102,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddWarning(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void AddWarning(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -122,7 +122,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddError(Func<object> messageProvider, string tag = "Piano", Object context = null)
+        public static void AddError(Func<object> messageProvider, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             if (!Instance)
@@ -143,7 +143,7 @@ namespace Arcube
 #endif
         }
 
-        public static void AddException(Exception ex, string tag = "Piano", Object context = null)
+        public static void AddException(Exception ex, string tag = "Flowchart", Object context = null)
         {
 #if UNITY_EDITOR
             Debug.LogException(ex, context);
@@ -152,7 +152,7 @@ namespace Arcube
             if (!Instance || !Instance.LOGSettings.showException) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX
             Debug.LogError(ex.Message, context);
-            instance.CreateText(ex.StackTrace, LogType.Error);
+            Instance.CreateText(ex.StackTrace, LogType.Error);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.Red;
             System.Console.WriteLine($"{tag}: {ex.Message}");

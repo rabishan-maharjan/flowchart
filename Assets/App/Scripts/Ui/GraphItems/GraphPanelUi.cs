@@ -138,6 +138,11 @@ public class GraphPanelUi : Ui
             {
                 var obj = await AssetManager.Instantiate<NodeObject>(node.Name, container);
                 obj.Node = node;
+                if (node is Command command)
+                {
+                    obj.Text = command.GetDescription();
+                }
+                
                 var rt = (RectTransform)obj.transform;
                 rt.anchoredPosition = node.AnchoredPosition.ToVector2();
                 nodesObjects.Add(obj);

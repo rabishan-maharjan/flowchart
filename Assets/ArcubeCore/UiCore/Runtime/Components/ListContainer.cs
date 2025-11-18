@@ -98,6 +98,11 @@ namespace Arcube.UiManagement
             rt.anchoredPosition = Vector2.zero;
         }
 
-        public T CreateItem<T>() => Instantiate(panelItemPrefab, transform).GetComponent<T>();
+        public T CreateItem<T>() where T : PanelItem
+        {
+            var item = Instantiate(panelItemPrefab, transform).GetComponent<T>();
+            Objects.Add(item);
+            return item;
+        }
     }
 }

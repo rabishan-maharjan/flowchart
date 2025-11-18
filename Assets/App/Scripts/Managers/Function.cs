@@ -22,7 +22,7 @@ public class Function
             ActiveNode = Nodes.Find(x => x.ID == nodeId);
             while (ActiveNode is not EndNode)
             {
-                Debug.Log($"Executing {ActiveNode.Name}");
+                //Debug.Log($"Executing {ActiveNode.Name}");
 
                 var command = (Command)ActiveNode;
                 if (command is InputCommand inputCommand)

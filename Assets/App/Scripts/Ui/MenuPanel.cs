@@ -11,8 +11,10 @@ public class MenuPanel : MonoBehaviour
     private IOManager _ioManager;
     private const string Root = "Projects";
     private const string Ext = "flw";
+    private AppUi _appUi;
     private void Start()
     {
+        _appUi = UiManager.GetUi<AppUi>();
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _ioManager = AppManager.GetManager<IOManager>();
         
@@ -22,7 +24,8 @@ public class MenuPanel : MonoBehaviour
         {
             _flowChartManager.New();
             _ioManager.New();
-            UiManager.GetUi<AppUi>().variableListPanel.Clear();
+            _appUi.SetTitle("New Project");
+            _appUi.variableListPanel.Clear();
         });
         
         gameObject.FindObject<ButtonImage>("b_open").OnClick.AddListener(Load);
@@ -60,6 +63,7 @@ public class MenuPanel : MonoBehaviour
             }
             
             UiManager.GetUi<GraphPanelUi>().GenerateCode();
+            _appUi.SetTitle(Path.GetFileNameWithoutExtension(fileName));
             _ioManager.Save(fileName, _flowChartManager.Functions);
         }
         catch (Exception e)
@@ -77,6 +81,7 @@ public class MenuPanel : MonoBehaviour
             if(string.IsNullOrEmpty(fileName)) return;
             
             UiManager.GetUi<GraphPanelUi>().GenerateCode();
+            _appUi.SetTitle(Path.GetFileNameWithoutExtension(fileName));
             _ioManager.Save($"{fileName}.{Ext}", _flowChartManager.Functions);
         }
         catch (Exception e)
@@ -89,12 +94,12 @@ public class MenuPanel : MonoBehaviour
     {
         try
         {
-            UiManager.GetUi<AppUi>().variableListPanel.Clear();
-            
             var path = Path.Combine(Application.persistentDataPath, Root);
             var fileName = await FileBrowser.Instance.OpenLoad(path, Ext);
             if(string.IsNullOrEmpty(fileName)) return;
             
+            _appUi.SetTitle(Path.GetFileNameWithoutExtension(fileName));
+            UiManager.GetUi<AppUi>().variableListPanel.Clear();
             var code = _flowChartManager.Functions = _ioManager.Load($"{fileName}.{Ext}");
             foreach (var function in code)
             {

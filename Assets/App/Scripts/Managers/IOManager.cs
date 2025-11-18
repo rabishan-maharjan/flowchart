@@ -12,6 +12,7 @@ public class IOManager : ManagerBase
     public override Task Register()
     {
         _projectFolder = Path.Combine(Application.persistentDataPath, "Projects");
+        if(!Directory.Exists(_projectFolder)) Directory.CreateDirectory(_projectFolder);
         return base.Register();
     }
 

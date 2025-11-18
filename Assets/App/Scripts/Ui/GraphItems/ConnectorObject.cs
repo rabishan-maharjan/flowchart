@@ -56,11 +56,11 @@ public class ConnectorObject : GraphObject
         
             if (!TryGetComponent(out DynamicLineDrawer lineDrawer))
             {
-                Debug.Log("Adding new line drawer");
+                //Debug.Log("Adding new line drawer");
                 lineDrawer = gameObject.AddComponent<DynamicLineDrawer>();
             }
         
-            Debug.Log($"Adding line between {name} and {nodeObject.name} {Time.time}", gameObject);
+            //Debug.Log($"Adding line between {name} and {nodeObject.name} {Time.time}", gameObject);
             _ = lineDrawer.Set((RectTransform)nodeObject.transform);
 
             CreateBranchLoop(branchConnector);

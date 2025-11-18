@@ -29,7 +29,8 @@ public class OutputCommand : Command
                 Output += v.Value;
             }
         }
-        
+     
+        //Debug.Log($"Output: {Output}");
         Function.OnOutput.Invoke(Output);
         
         Completed = true;

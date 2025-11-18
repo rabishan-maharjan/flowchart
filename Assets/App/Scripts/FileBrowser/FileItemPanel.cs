@@ -16,11 +16,11 @@ public class FileItemPanel : PanelItem
             {
                 FileBrowser.Instance.Close();
             }
-            else StartCoroutine(DoubleClick());
+            else StartCoroutine(WaitForDoubleClick());
         });
     }
     
-    private IEnumerator DoubleClick()
+    private IEnumerator WaitForDoubleClick()
     {
         _isClickActive = true;
         yield return new WaitForSeconds(DoubleClickSpeed);

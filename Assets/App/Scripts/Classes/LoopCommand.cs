@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Arcube;
+using UnityEngine;
 
 public class LoopCommand : Command
 {
@@ -20,32 +21,39 @@ public class LoopCommand : Command
         {
             for (var i = Count - 1; i >= 0; i -= Steps)
             {
-                await ExecuteLoopItem();
+                await ExecuteLoopItems();
             }
         }
         else
         {
             for (var i = 0; i < Count; i++)
             {
-                await ExecuteLoopItem();
+                await ExecuteLoopItems();
             }    
-        }
-        
-        var node = AppManager.GetManager<FlowChartManager>().GetNode(NextNode);
-        if (node is Command command)
-        {
-            await command.Execute();
         }
         
         Completed = true;
     }
     
-    private async Task ExecuteLoopItem()
+    private async Task ExecuteLoopItems()
     {
         var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeLoop);
-        if (node is Command command)
+        while (node != null)
         {
-            await command.Execute();
+            if (node is Command command)
+            {
+                //Debug.Log($"Executing {command.Name} from loop");
+                await command.Execute();
+            }
+
+            if (!string.IsNullOrEmpty(node.NextNode))
+            {
+                node = AppManager.GetManager<FlowChartManager>().GetNode(node.NextNode);
+            }
+            else
+            {
+                break;
+            }
         }
     }
 

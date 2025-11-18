@@ -11150,6 +11150,7 @@ MonoBehaviour:
   closable: 0
   deactivateOnClose: 0
   variableListPanel: {fileID: 1104658780}
+  t_title: {fileID: 1978631735}
 --- !u!1 &1484388971
 GameObject:
   m_ObjectHideFlags: 0
@@ -13814,7 +13815,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Untitled
+  m_text: New Project
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
   m_sharedMaterial: {fileID: -2923171080115597416, guid: 3ceb688d7ebc91e4d81ae05ebc393221, type: 2}
