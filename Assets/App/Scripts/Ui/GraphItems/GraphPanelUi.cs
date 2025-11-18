@@ -14,23 +14,32 @@ public class GraphPanelUi : Ui
     public override Task Register()
     {
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
-        _flowChartManager.OnCodeStateChanged += async state =>
+        _flowChartManager.OnCodeStateChanged += HandleCodeStateChanged;
+        return base.Register();
+    }
+
+    private async void HandleCodeStateChanged(AppState state)
+    {
+        try
         {
             if (state != AppState.New) return;
-            
+
             Clear();
-            
+
             var startNode = await AssetManager.Instantiate<NodeObject>("StartNode", container);
             startNode.transform.localPosition = Vector3.zero;
-                
+
             var endNode = await AssetManager.Instantiate<NodeObject>("EndNode", container);
             var rt = (RectTransform)endNode.transform;
             rt.anchoredPosition = new Vector2(0, -100);
-                
+
             startNode.ConnectorObject.Connect(endNode);
             //Connect(startNode.connector, endNode);
-        };
-        return base.Register();
+        }
+        catch(Exception e)
+        {
+            Log.AddException(e);
+        }
     }
     
     private void Clear()
@@ -135,7 +144,6 @@ public class GraphPanelUi : Ui
             }
         }
         
-        //check for connections
         foreach (var function in functions)
         {
             foreach (var node in function.Value.Nodes)

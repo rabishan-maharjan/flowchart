@@ -49,6 +49,12 @@ public class DynamicLineDrawer : MonoBehaviour
     private void Update()
     {
         if(!_set) return;
+
+        if (!_startNodeConnector || !_endNode || !_lineRenderer)
+        {
+            Destroy(this);
+            return;
+        }
         
         // Update the line and arrow only if positions have changed
         if (_startNodeConnector.position == _previousStartPosition && _endNode.position == _previousEndPosition) return;
@@ -126,17 +132,7 @@ public class DynamicLineDrawer : MonoBehaviour
     {
         Destroy(_lineRenderer);
         if(_arrow) Destroy(_arrow.gameObject);
-    }
-
-    public void Clear()
-    {
-        Debug.Log("Clearing " + gameObject.name, gameObject);
-        _set = false;
-        if(_lineRenderer) _lineRenderer.positionCount = 0;
-        if (_arrow)
-        {
-            Destroy(_arrow.gameObject);
-            _arrow = null;
-        }
+        
+        Debug.LogWarning($"Destroying line drawer {name} {Time.time}", gameObject);
     }
 }

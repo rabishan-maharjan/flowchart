@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Arcube.Utility;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -13,30 +11,28 @@ namespace Arcube
 {
     public class Log : MonoBehaviour
     {
-        [FormerlySerializedAs("_settings")] [SerializeField]
-        private LogColorSettings colorSettings;
-
+        [SerializeField] private LogColorSettings colorSettings;
         [SerializeField] private TMP_Text t_text;
         [SerializeField] private ScrollRect _scroll;
-        public static Log instance;
+        public static Log Instance;
         [field: SerializeField] public LogSettings LOGSettings { get; set; }
 
-        private void Awake() => instance = this;
+        private void Awake() => Instance = this;
 
         public static void Add(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.Log(messageProvider(), context);
                 return;
             }
 #endif
-            if (!instance.LOGSettings.showNormal) return;
+            if (!Instance.LOGSettings.showNormal) return;
                 
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.Log($"{tag}: {messageProvider()}", context);
-            instance.CreateText(messageProvider(), LogType.Default);
+            Instance.CreateText(messageProvider(), LogType.Default);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.White;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -47,16 +43,16 @@ namespace Arcube
         public static void AddTest(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.Log(messageProvider(), context);
                 return;
             }
 #endif
-            if (!instance.LOGSettings.showTest) return;
+            if (!Instance.LOGSettings.showTest) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.Log($"{tag}: {messageProvider()}", context);
-            instance.CreateText(messageProvider(), LogType.Default);
+            Instance.CreateText(messageProvider(), LogType.Default);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.White;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -67,16 +63,16 @@ namespace Arcube
         public static void AddPriority(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.Log(messageProvider(), context);
                 return;
             }
 #endif
-            if (!instance.LOGSettings.showPriority) return;
+            if (!Instance.LOGSettings.showPriority) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.Log($"{tag}: {messageProvider()}", context);
-            instance.CreateText(messageProvider(), LogType.Priority);
+            Instance.CreateText(messageProvider(), LogType.Priority);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.White;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -87,17 +83,17 @@ namespace Arcube
         public static void AddHighlight(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.Log($"<color=green>{messageProvider()}</color>", context);
                 return;
             }
 #endif
 
-            if (!instance.LOGSettings.showHighlights) return;
+            if (!Instance.LOGSettings.showHighlights) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.Log($"{tag}: <color=green>{messageProvider()}</color>", context);
-            instance.CreateText(messageProvider(), LogType.Highlight);
+            Instance.CreateText(messageProvider(), LogType.Highlight);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.Green;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -109,16 +105,16 @@ namespace Arcube
         public static void AddWarning(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.LogWarning(messageProvider(), context);
                 return;
             }
 #endif
-            if (!instance.LOGSettings.showWarning) return;
+            if (!Instance.LOGSettings.showWarning) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.LogWarning($"{tag}: {messageProvider()}", context);
-            instance.CreateText(messageProvider(), LogType.Warning);
+            Instance.CreateText(messageProvider(), LogType.Warning);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.Yellow;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -129,17 +125,17 @@ namespace Arcube
         public static void AddError(Func<object> messageProvider, string tag = "Piano", Object context = null)
         {
 #if UNITY_EDITOR
-            if (!instance)
+            if (!Instance)
             {
                 Debug.LogError(messageProvider(), context);
                 return;
             }
 #endif
-            if (!instance.LOGSettings.showError) return;
+            if (!Instance.LOGSettings.showError) return;
 
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX || UNITY_EDITOR
             Debug.LogError($"{tag}: {messageProvider()}", context);
-            instance.CreateText(messageProvider(), LogType.Error);
+            Instance.CreateText(messageProvider(), LogType.Error);
 #else
             System.Console.ForegroundColor = System.ConsoleColor.Red;
             System.Console.WriteLine($"{tag}: {messageProvider()}");
@@ -153,7 +149,7 @@ namespace Arcube
             Debug.LogException(ex, context);
             return;
 #endif
-            if (!instance.LOGSettings.showException) return;
+            if (!Instance || !Instance.LOGSettings.showException) return;
 #if UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX
             Debug.LogError(ex.Message, context);
             instance.CreateText(ex.StackTrace, LogType.Error);
@@ -166,6 +162,8 @@ namespace Arcube
 
         private void CreateText(object obj, LogType logType)
         {
+            if(!Instance.LOGSettings.createText) return;
+            
             var color = colorSettings.GetColor(logType);
             CreateText(obj, color);
         }
@@ -193,12 +191,11 @@ namespace Arcube
         private const int BufferSize = 10; // Number of logs before writing to file
         private void Start()
         {
-            LOGSettings = EnvironmentController.Env.logSettings;
+            Application.logMessageReceived += HandleLog;
+            
             if (!LOGSettings.saveLogs) return;
 
-            _filePath = Path.Combine(Application.persistentDataPath, "logs.txt");
-
-            Application.logMessageReceived += HandleLog;
+            _filePath = Path.Combine(Application.persistentDataPath, "logs.txt");            
         }
 
         public void Clear()
@@ -214,7 +211,9 @@ namespace Arcube
 
         private static void HandleLog(string condition, string stackTrace, UnityEngine.LogType type)
         {
-            if (!instance.LOGSettings.saveLogs) return;
+            if(type == UnityEngine.LogType.Exception) AddError(() => $"{condition} {type} \n{stackTrace}", "System");
+            
+            if (!Instance.LOGSettings.saveLogs) return;
 
             if (type is not (UnityEngine.LogType.Error or UnityEngine.LogType.Exception)) return;
             lock (Lock)

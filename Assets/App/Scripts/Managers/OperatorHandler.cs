@@ -8,6 +8,11 @@ public static class OperatorHandler
     {
         "+", "-", "*", "/", "%"
     };
+    
+    public static readonly string[] StringOperators =
+    {
+        "+"
+    };
 
     public static readonly string[] LogicOperators =
     {

@@ -51,7 +51,7 @@ public class LogicExpressionPanel : Panel
         if(v1 != null) dr_variable_1.SetValueWithoutNotify(allVariables.IndexOf(v1));
         
         var v2 = Variable.TryGetVariable(expression.Variable2);
-        if(v2 != null) dr_variable_2.Set(allVariables, v2);
+        dr_variable_2.Set(allVariables, v2);
         
         var operators = new List<string>(OperatorHandler.LogicOperators);
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();

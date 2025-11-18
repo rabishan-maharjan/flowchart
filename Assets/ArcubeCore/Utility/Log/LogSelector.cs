@@ -27,7 +27,7 @@ namespace Arcube
         private void OnSelect(int index)
         {
             if (index == 0) return;
-            Log.instance.LOGSettings = logSettings[index - 1];
+            Log.Instance.LOGSettings = logSettings[index - 1];
         }
     }
 }

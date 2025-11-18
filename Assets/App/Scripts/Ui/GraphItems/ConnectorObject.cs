@@ -1,3 +1,6 @@
+using System;
+using System.Threading.Tasks;
+using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
 
@@ -13,6 +16,7 @@ public class ConnectorObject : GraphObject
     [SerializeField] private NodeType nodeType = NodeType.Flow;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
     public NodeObject NextNodeObject { get; private set; }
+
     protected override void Reset()
     {
         ParentNodeObject = GetComponentInParent<NodeObject>();
@@ -27,59 +31,67 @@ public class ConnectorObject : GraphObject
     public override void Delete(bool force) => Clear();
 
     //this is reference to the line drawer of the connector object that is connected to the branch connector
-    public DynamicLineDrawer CloseLoopLineDrawer { get; set; }
-    public void Connect(NodeObject nodeObject)
+    public async void Connect(NodeObject nodeObject)
     {
-        if (NextNodeObject)
+        try
         {
-            NextNodeObject.PrevConnectorObject = null;
-        }
-        
-        var branchConnector = GetBranchConnector();
-        branchConnector?.CloseLoopLineDrawer?.Clear();
+            if (NextNodeObject)
+            {
+                NextNodeObject.PrevConnectorObject = null;
+            }
 
-        if (nodeObject.PrevConnectorObject)
-        {
-            nodeObject.PrevConnectorObject.Clear();
-        }
-        
-        NextNodeObject = nodeObject;
-        nodeObject.PrevConnectorObject = this;
-  
-        if(!TryGetComponent(out DynamicLineDrawer lineDrawer))
-        {
-            lineDrawer = gameObject.AddComponent<DynamicLineDrawer>();
-        } 
-        
-        Debug.Log("Adding line between " + name + " and " + nodeObject.name, gameObject);
-        _ = lineDrawer.Set((RectTransform)nodeObject.transform);
+            var branchConnector = GetBranchConnector();
+            if (branchConnector) ClearBranchLoop(branchConnector.NextNodeObject);
 
-        CreateBranchLoop(branchConnector);
+            if (nodeObject.PrevConnectorObject)
+            {
+                nodeObject.PrevConnectorObject.Clear();
+            }
+
+            NextNodeObject = nodeObject;
+            nodeObject.PrevConnectorObject = this;
+        
+            await Task.Yield();
+            await Task.Yield();
+        
+            if (!TryGetComponent(out DynamicLineDrawer lineDrawer))
+            {
+                Debug.Log("Adding new line drawer");
+                lineDrawer = gameObject.AddComponent<DynamicLineDrawer>();
+            }
+        
+            Debug.Log($"Adding line between {name} and {nodeObject.name} {Time.time}", gameObject);
+            _ = lineDrawer.Set((RectTransform)nodeObject.transform);
+
+            CreateBranchLoop(branchConnector);
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     private ConnectorObject GetBranchConnector()
     {
         var prevConnectorObject = this;
-        ConnectorObject branchConnector = null;
         while (prevConnectorObject)
         {
             if (prevConnectorObject.branchNode)
             {
-                branchConnector = prevConnectorObject.ParentNodeObject is LogicNodeObject ? prevConnectorObject.ParentNodeObject.ConnectorObject : prevConnectorObject;
-                break;
+                return prevConnectorObject;
             }
 
             prevConnectorObject = prevConnectorObject.ParentNodeObject.PrevConnectorObject;
         }
 
-        return branchConnector;
+        return null;
     }
-    
+
     private void CreateBranchLoop(ConnectorObject branchConnector)
     {
         if (!branchConnector) return;
-        
-        var lastNodeObject = NextNodeObject;
+
+        var lastNodeObject = branchConnector.NextNodeObject;
         while (lastNodeObject)
         {
             if (!lastNodeObject.ConnectorObject.NextNodeObject)
@@ -89,28 +101,60 @@ public class ConnectorObject : GraphObject
 
             lastNodeObject = lastNodeObject.ConnectorObject.NextNodeObject;
         }
-        
-        lastNodeObject?.CloseNode(branchConnector);
-    }
-    
-    public void Clear()
-    {
-        if (!NextNodeObject) return;
-        NextNodeObject.PrevConnectorObject = null;
 
-        if (!NextNodeObject.ConnectorObject.NextNodeObject)
+        if (branchConnector.ParentNodeObject is LogicNodeObject logicNodeObject)
         {
-            if (NextNodeObject.ConnectorObject.CloseLoopLineDrawer)
-            {
-                Destroy(NextNodeObject.ConnectorObject.CloseLoopLineDrawer);
-            }
+            lastNodeObject?.CloseNode(logicNodeObject.ConnectorObject);    
         }
-        
-        if (TryGetComponent(out DynamicLineDrawer lineDrawer))
+        else if(branchConnector.ParentNodeObject is LoopNodeObject loopNode)
         {
-            Destroy(lineDrawer);
+            lastNodeObject?.CloseNode(loopNode.ConnectorLoopObject);
         }
+    }
+
+    private void ClearBranchLoop(NodeObject nodeObject)
+    {
+        var nextNodeObject = nodeObject;
+        while (nextNodeObject)
+        {
+            if (!nextNodeObject.ConnectorObject) break;
             
-        NextNodeObject = null;
+            if (!nextNodeObject.ConnectorObject.NextNodeObject &&  nextNodeObject.ConnectorObject.TryGetComponent<DynamicLineDrawer>(out var lineDrawer))
+            {
+                Debug.LogWarning($"Destroying line drawer {lineDrawer.name} {Time.time}", lineDrawer.gameObject);
+                Destroy(lineDrawer);
+            }
+
+            nextNodeObject = nextNodeObject.ConnectorObject.NextNodeObject;
+        }
+    }
+
+    public async void Clear()
+    {
+        try
+        {
+            if (!NextNodeObject) return;
+            NextNodeObject.PrevConnectorObject = null;
+
+            ClearBranchLoop(NextNodeObject);
+
+            if (TryGetComponent(out DynamicLineDrawer lineDrawer))
+            {
+                Destroy(lineDrawer);
+            }
+
+            NextNodeObject = null;
+
+            await Task.Yield();
+            await Task.Yield();
+        
+            CreateBranchLoop(GetBranchConnector());
+
+            GraphPanelUi.Selected = null;
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 }

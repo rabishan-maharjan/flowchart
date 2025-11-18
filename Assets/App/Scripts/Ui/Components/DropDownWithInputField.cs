@@ -76,14 +76,17 @@ public class DropDownWithInputField : MonoBehaviour
             _dropdown.options = variableNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
             gameObject.SetActive(true);
 
-            if (variableNames.Contains(selected.Name))
+            if (selected != null)
             {
-                var selectedIndex = variableNames.IndexOf(selected.Name) + 1;
-                _dropdown.SetValueWithoutNotify(selectedIndex);
-            }
+                if (variableNames.Contains(selected.Name))
+                {
+                    var selectedIndex = variableNames.IndexOf(selected.Name) + 1;
+                    _dropdown.SetValueWithoutNotify(selectedIndex);
+                }
 
-            ip_field.SetTextWithoutNotify(selected.Name);
-            name = !string.IsNullOrEmpty(selected.Name) ? selected.Name : "new";
+                ip_field.SetTextWithoutNotify(selected.Name);
+                name = !string.IsNullOrEmpty(selected.Name) ? selected.Name : "new";
+            }
 
             if(!b_delete) return;
             b_delete.OnClick.AddListener(() =>

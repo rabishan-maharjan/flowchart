@@ -54,5 +54,14 @@ namespace Arcube
                 Log.AddException(e);
             }
         }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                //exit full screen mode
+                Screen.fullScreen = false;
+            }
+        }
     }
 }

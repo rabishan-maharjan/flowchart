@@ -15,7 +15,7 @@ public class LogicCommandUi : CommandUi
     private List<Variable> _exposedVariables;
     [SerializeField] private Transform list;
     private FlowChartManager _flowChartManager;
-    protected override async void SetUi()
+    protected override void SetUi()
     {
         try
         {
@@ -24,7 +24,7 @@ public class LogicCommandUi : CommandUi
                 Destroy(e.gameObject);
             }
             
-            await Task.Yield();
+            Debug.LogWarning("Setting ui");
             
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;

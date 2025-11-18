@@ -123,13 +123,13 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     {
         if(this is EndNodeObject) return;
         
-        newBranchConnectorObject.CloseLoopLineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
-        if (!newBranchConnectorObject.CloseLoopLineDrawer)
+        var lineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
+        if (!lineDrawer)
         {
-            newBranchConnectorObject.CloseLoopLineDrawer = ConnectorObject.gameObject.AddComponent<DynamicLineDrawer>();
+            lineDrawer = ConnectorObject.gameObject.AddComponent<DynamicLineDrawer>();
         }
         
-        _ = newBranchConnectorObject.CloseLoopLineDrawer.Set(newBranchConnectorObject.transform.GetChild(0) as RectTransform, false);
+        _ = lineDrawer.Set(newBranchConnectorObject.transform.GetChild(0) as RectTransform, false);
     }
 
     public override void Delete(bool force)

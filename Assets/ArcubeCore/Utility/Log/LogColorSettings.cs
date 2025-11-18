@@ -11,7 +11,7 @@ namespace Arcube
         Priority,
     }
 
-    [CreateAssetMenu(fileName = "LogSettings", menuName = "AppData/LogSettings")]
+    [CreateAssetMenu(fileName = "LogSettings", menuName = "AppData/LogColorSettings")]
     public class LogColorSettings : ScriptableObject
     {
         public Color defaultColor = Color.white;
