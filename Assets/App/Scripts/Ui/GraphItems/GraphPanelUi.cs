@@ -136,6 +136,7 @@ public class GraphPanelUi : Ui
         {
             foreach (var node in function.Value.Nodes)
             {
+                Debug.Log($"Instantiating {node.Name}");
                 var obj = await AssetManager.Instantiate<NodeObject>(node.Name, container);
                 obj.Node = node;
                 if (node is Command command)

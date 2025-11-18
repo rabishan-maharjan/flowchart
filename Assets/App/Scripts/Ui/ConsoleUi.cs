@@ -2,6 +2,7 @@ using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ConsoleUi : Ui
 {
@@ -72,6 +73,7 @@ public class ConsoleUi : Ui
     {
         var selected = isUser ? userItem : compilerItem;
         var item =  Instantiate(selected, listContainer.transform);
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)listContainer.transform);
         item.SetText(text, Color.black);
     }
     

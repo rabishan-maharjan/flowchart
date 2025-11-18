@@ -36,7 +36,7 @@ namespace Arcube.UiManagement
 
         public bool isStatic = true;
         protected bool Initialized;
-        protected List<PanelItem> Objects { get; private set; } = new();
+        protected List<PanelItem> Objects { get; } = new();
         protected override void SetUi()
         {
             if (isStatic && Initialized) return;
@@ -55,6 +55,9 @@ namespace Arcube.UiManagement
 
             if (lastEmptyItem) lastEmptyItem.SetAsLastSibling();
             if (firstEmptyItem) firstEmptyItem.SetAsFirstSibling();
+            
+            //rebuild layout
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
 
             Initialized = true;
         }
@@ -102,6 +105,8 @@ namespace Arcube.UiManagement
         {
             var item = Instantiate(panelItemPrefab, transform).GetComponent<T>();
             Objects.Add(item);
+            //rebuild layout
+            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
             return item;
         }
     }

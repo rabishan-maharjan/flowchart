@@ -8868,7 +8868,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
   m_Padding:
-    m_Left: 0
+    m_Left: 10
     m_Right: 0
     m_Top: 0
     m_Bottom: 10
@@ -11629,7 +11629,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1469117581}
-  - {fileID: 207897565}
   - {fileID: 2023524263}
   - {fileID: 738782760}
   - {fileID: 103217172}
@@ -11638,6 +11637,7 @@ RectTransform:
   - {fileID: 2067118990}
   - {fileID: 1009551621}
   - {fileID: 677966723}
+  - {fileID: 207897565}
   - {fileID: 484529432}
   - {fileID: 1118748981}
   m_Father: {fileID: 2075585688}
