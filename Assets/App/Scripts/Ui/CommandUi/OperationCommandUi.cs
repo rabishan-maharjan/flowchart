@@ -50,7 +50,7 @@ public class OperationCommandUi : CommandUi
             AddField(expression);
         }
         
-        if(list.childCount == 1) AddField(new Expression());
+        if(operationCommand.Expressions.Count == 0) AddField(new Expression());
     }
 
     private void AddField(Expression expression)

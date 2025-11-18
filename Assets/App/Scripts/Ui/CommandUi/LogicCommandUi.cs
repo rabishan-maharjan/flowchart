@@ -37,7 +37,7 @@ public class LogicCommandUi : CommandUi
                 AddField(expression);
             }
             
-            if(list.childCount == 1) AddField(new LogicExpression());
+            if(logicCommand.Expressions.Count == 0) AddField(new LogicExpression());
         }
         catch(Exception e)
         {

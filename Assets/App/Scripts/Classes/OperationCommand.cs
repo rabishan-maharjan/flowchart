@@ -71,6 +71,14 @@ public class OperationCommand : Command
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
         var v = flowChartManager.VariableMap[Variable];
-        return $"Operating on {v.Name}";
+        var output = $"{v.Name} = ";
+        foreach (var expression in Expressions)
+        {
+            var v1 = flowChartManager.VariableMap[expression.Variable];
+            output += $"{v1.Name}";
+            if(!string.IsNullOrEmpty(expression.Operator)) output += $" {expression.Operator} ";
+        }
+
+        return string.IsNullOrEmpty(output) ? "Operation" : output;
     }
 }

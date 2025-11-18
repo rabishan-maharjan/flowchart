@@ -15,6 +15,7 @@ public abstract class CommandObject : NodeObject
         
         if (Time.time - _lastClickTime < DoubleClickTime)
         {
+            GraphPanelUi.Selected = null;
             _ = OpenCommandUi();
             _lastClickTime = 0;
         }
