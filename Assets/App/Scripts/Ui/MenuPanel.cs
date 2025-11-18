@@ -89,6 +89,8 @@ public class MenuPanel : MonoBehaviour
     {
         try
         {
+            UiManager.GetUi<AppUi>().variableListPanel.Clear();
+            
             var path = Path.Combine(Application.persistentDataPath, Root);
             var fileName = await FileBrowser.Instance.OpenLoad(path, Ext);
             if(string.IsNullOrEmpty(fileName)) return;

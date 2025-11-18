@@ -31,6 +31,7 @@ public class ConsoleUi : Ui
         Function.OnInput += value =>
         {
             _activeVariable = AppManager.GetManager<FlowChartManager>().VariableMap[value];
+            ip_input.contentType = _activeVariable.Type == VariableType.Number ? TMP_InputField.ContentType.DecimalNumber : TMP_InputField.ContentType.Alphanumeric;
             ip_input.interactable = true;
             ip_input.Select();
         };
@@ -41,6 +42,12 @@ public class ConsoleUi : Ui
         
         ip_input.onSubmit.AddListener((value) =>
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                MessageUi.Show("Input cannot be empty");
+                return;
+            }
+            
             AddText(value, true);
             _activeVariable.Value = value;
             ((Command)Function.ActiveNode).Completed = true;
@@ -55,6 +62,7 @@ public class ConsoleUi : Ui
         {
             Destroy(panel.gameObject);
         }
+        
         ip_input.SetTextWithoutNotify("");
         
         base.SetUi();
