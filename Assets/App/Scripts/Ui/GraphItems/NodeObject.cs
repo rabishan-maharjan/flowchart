@@ -119,17 +119,17 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         return true;
     }
 
-    public void CloseNode(ConnectorObject branchConnectorObject)
+    public void CloseNode(ConnectorObject newBranchConnectorObject)
     {
         if(this is EndNodeObject) return;
         
-        var dynamicLineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
-        if (!dynamicLineDrawer)
+        newBranchConnectorObject.CloseLoopLineDrawer = ConnectorObject.GetComponent<DynamicLineDrawer>();
+        if (!newBranchConnectorObject.CloseLoopLineDrawer)
         {
-            dynamicLineDrawer = ConnectorObject.gameObject.AddComponent<DynamicLineDrawer>();
+            newBranchConnectorObject.CloseLoopLineDrawer = ConnectorObject.gameObject.AddComponent<DynamicLineDrawer>();
         }
         
-        _ = dynamicLineDrawer.Set(branchConnectorObject.transform.GetChild(0) as RectTransform);
+        _ = newBranchConnectorObject.CloseLoopLineDrawer.Set(newBranchConnectorObject.transform.GetChild(0) as RectTransform, false);
     }
 
     public override void Delete(bool force)

@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class DynamicLineDrawer : MonoBehaviour
 {
-    [SerializeField] private bool drawArrow = true;
     private RectTransform _startNodeConnector; // Reference to StartNode->Connector
     private RectTransform _endNode; // Reference to EndNode
     private LineRenderer _lineRenderer; // Single LineRenderer
@@ -11,11 +10,19 @@ public class DynamicLineDrawer : MonoBehaviour
     private Vector3 _previousStartPosition; // Previous position of StartNode->Connector
     private Vector3 _previousEndPosition; // Previous position of EndNode
     private GraphSettings _graphSettings;
-    private bool _set = false;
-    public async Task Set(RectTransform endNote)
+    private bool _set;
+    [SerializeField] private bool drawArrow = true;
+
+    public async Task Set(RectTransform endNode, bool shouldDrawArrow)
+    {
+        drawArrow = shouldDrawArrow;
+        await Set(endNode);
+    }
+    
+    public async Task Set(RectTransform endNode)
     {
         _set = true;
-        _endNode = endNote;
+        _endNode = endNode;
         _startNodeConnector = (RectTransform)transform.GetChild(0);
         
         _graphSettings = GraphSettings.Instance;
@@ -123,7 +130,13 @@ public class DynamicLineDrawer : MonoBehaviour
 
     public void Clear()
     {
+        Debug.Log("Clearing " + gameObject.name, gameObject);
         _set = false;
         if(_lineRenderer) _lineRenderer.positionCount = 0;
+        if (_arrow)
+        {
+            Destroy(_arrow.gameObject);
+            _arrow = null;
+        }
     }
 }

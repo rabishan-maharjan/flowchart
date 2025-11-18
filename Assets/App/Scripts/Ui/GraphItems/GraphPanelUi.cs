@@ -41,7 +41,6 @@ public class GraphPanelUi : Ui
         }
     }
 
-    public Action<GraphObject> OnSelected { get; set; }
     public static GraphObject Selected { get; set; }
     private void Update()
     {
