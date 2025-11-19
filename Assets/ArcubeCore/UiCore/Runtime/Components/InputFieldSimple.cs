@@ -16,6 +16,11 @@ namespace Arcube.UiManagement
             set => placeHolder.text = value;
         }
         
+        public bool Interactable
+        {
+            set => inputField.interactable = value;
+        }
+        
         public TMP_InputField.ContentType ContentType
         {
             set => inputField.contentType = value;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ public class OutputCommand : Command
     }
 
     [JsonIgnore] private string Output { get; set; }
-    public override Task Execute()
+    public override async Task Execute(CancellationTokenSource cts)
     {
         Output = "";
         foreach (var variable in Variables)
@@ -33,8 +34,8 @@ public class OutputCommand : Command
         //Debug.Log($"Output: {Output}");
         Function.OnOutput.Invoke(Output);
         
+        await Wait(cts);
         Completed = true;
-        return Task.CompletedTask;
     }
 
     public override string GetDescription()
@@ -43,6 +44,19 @@ public class OutputCommand : Command
         foreach (var variable in Variables)
         {
             output += Variable.TryGetVariable(variable)?.Name;
+        }
+        
+        return output;
+    }
+    
+    public override string GetValue()
+    {
+        var output = "Output\n";
+        foreach (var variable in Variables)
+        {
+            var v = Variable.TryGetVariable(variable);
+            if(v == null) continue;
+            output += v.Name + " = " + v.Value;
         }
         
         return output;

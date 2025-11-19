@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public abstract class CommandObject : NodeObject
 {
@@ -29,5 +30,6 @@ public abstract class CommandObject : NodeObject
     {
         await Task.Yield();
         Text = Command.GetDescription();
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }
 }

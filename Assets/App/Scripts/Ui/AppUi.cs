@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
 using TMPro;
@@ -14,8 +15,36 @@ public class AppUi : Ui
         
         base.Reset();
     }
-    
-    public void SetTitle(string title)
+
+    public override Task Register()
+    {
+        var flowChartManager =AppManager.GetManager<FlowChartManager>(); 
+        flowChartManager.OnProjectStateChanged += (state, projectName) =>
+        {
+            switch (state)
+            {
+                case AppState.New:
+                    variableListPanel.Clear();
+                    SetTitle("New Project");
+                    break;
+                case AppState.Save:
+                    SetTitle(projectName);
+                    break;
+                case AppState.Load:
+                    variableListPanel.Clear();
+                    foreach (var variable in flowChartManager.VariableMap)
+                    {
+                        variableListPanel.CreateVariable(variable.Value);
+                    }
+                    SetTitle(projectName);
+                    break;
+            }
+        };
+        
+        return base.Register();
+    }
+
+    private void SetTitle(string title)
     {
         t_title.text = title;
     }

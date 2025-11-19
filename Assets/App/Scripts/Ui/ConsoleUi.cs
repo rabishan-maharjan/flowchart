@@ -2,7 +2,6 @@ using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ConsoleUi : Ui
 {
@@ -39,7 +38,11 @@ public class ConsoleUi : Ui
 
         Function.OnError += AddError;
         
-        gameObject.FindObject<ButtonImage>("b_close").OnClick.AddListener(Close);
+        gameObject.FindObject<ButtonImage>("b_close").OnClick.AddListener(()=>
+        {
+            AppManager.GetManager<FlowChartManager>().StopExecution();
+            Close();
+        });
         
         ip_input.onSubmit.AddListener((value) =>
         {
@@ -73,7 +76,6 @@ public class ConsoleUi : Ui
     {
         var selected = isUser ? userItem : compilerItem;
         var item =  Instantiate(selected, listContainer.transform);
-        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)listContainer.transform);
         item.SetText(text, Color.black);
     }
     

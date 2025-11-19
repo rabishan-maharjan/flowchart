@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
@@ -12,7 +14,7 @@ public class Function
     public static Action<string> OnOutput;
     public static event Action<string> OnError;
     public static Node ActiveNode { get; private set; }
-    public async void Execute()
+    public async void Execute(CancellationTokenSource cts)
     {
         var backup = Variables.ConvertAll(v => new Variable(v));
         try
@@ -30,7 +32,8 @@ public class Function
                     OnInput?.Invoke(inputCommand.Variable);
                 }
 
-                await command.Execute();
+                await command.Execute(cts);
+                await Task.Yield();
                 nodeId = command.NextNode;
                 if (string.IsNullOrEmpty(nodeId)) break;
                 ActiveNode = Nodes.Find(x => x.ID == nodeId);
@@ -48,7 +51,7 @@ public class Function
                 if (node is Command command) command.Completed = false;
             }
             
-            for (int i = 0; i < Variables.Count; i++)
+            for (var i = 0; i < Variables.Count; i++)
             {
                 Variables[i].Value = backup[i].Value;
                 Variables[i].Assigned = backup[i].Assigned;

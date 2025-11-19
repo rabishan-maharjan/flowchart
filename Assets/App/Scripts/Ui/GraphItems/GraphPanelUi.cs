@@ -6,6 +6,7 @@ using Arcube.AssetManagement;
 using Arcube.UiManagement;
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GraphPanelUi : Ui
 {
@@ -14,32 +15,48 @@ public class GraphPanelUi : Ui
     public override Task Register()
     {
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
-        _flowChartManager.OnCodeStateChanged += HandleCodeStateChanged;
+        _flowChartManager.OnProjectStateChanged += HandleCodeStateChanged;
         return base.Register();
     }
 
-    private async void HandleCodeStateChanged(AppState state)
+    private async void HandleCodeStateChanged(AppState state, string projectName)
     {
         try
         {
-            if (state != AppState.New) return;
-
-            Clear();
-
-            var startNode = await AssetManager.Instantiate<NodeObject>("StartNode", container);
-            startNode.transform.localPosition = Vector3.zero;
-
-            var endNode = await AssetManager.Instantiate<NodeObject>("EndNode", container);
-            var rt = (RectTransform)endNode.transform;
-            rt.anchoredPosition = new Vector2(0, -100);
-
-            startNode.ConnectorObject.Connect(endNode);
-            //Connect(startNode.connector, endNode);
+            switch (state)
+            {
+                case AppState.New:
+                {
+                    await New();
+                    break;
+                }
+                case AppState.Load:
+                    await GenerateFlowChart(_flowChartManager.Functions);
+                    break;
+                case AppState.Compile:
+                    GenerateCode();
+                    break;
+            }
         }
         catch(Exception e)
         {
             Log.AddException(e);
         }
+    }
+
+    private async Task New()
+    {
+        Clear();
+
+        var startNode = await AssetManager.Instantiate<NodeObject>("StartNode", container);
+        startNode.transform.localPosition = Vector3.zero;
+
+        var endNode = await AssetManager.Instantiate<NodeObject>("EndNode", container);
+        var rt = (RectTransform)endNode.transform;
+        rt.anchoredPosition = new Vector2(0, -100);
+
+        startNode.ConnectorObject.Connect(endNode);
+        //Connect(startNode.connector, endNode);
     }
     
     private void Clear()
@@ -142,6 +159,7 @@ public class GraphPanelUi : Ui
                 if (node is Command command)
                 {
                     obj.Text = command.GetDescription();
+                    LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)obj.transform);
                 }
                 
                 var rt = (RectTransform)obj.transform;

@@ -7,23 +7,17 @@ using UnityEngine;
 
 public class IOManager : ManagerBase
 {
-    public string CurrentFile { get; private set; }
     private string _projectFolder;
     public override Task Register()
     {
         _projectFolder = Path.Combine(Application.persistentDataPath, "Projects");
         if(!Directory.Exists(_projectFolder)) Directory.CreateDirectory(_projectFolder);
+        
         return base.Register();
-    }
-
-    public void New()
-    {
-        CurrentFile = string.Empty;
     }
 
     public void Save(string fileName, Dictionary<string, Function> code)
     {
-        CurrentFile = fileName;
         var settings = new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All
@@ -36,7 +30,6 @@ public class IOManager : ManagerBase
     
     public Dictionary<string, Function> Load(string fileName)
     {
-        CurrentFile = fileName;                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
         var settings = new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.All

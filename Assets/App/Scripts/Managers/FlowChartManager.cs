@@ -1,14 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
+using UnityEngine;
 
 public enum AppState
 {
     New,
+    Save,
     Load,
+    Compile,
     Run
+}
+
+public enum ExecutionType
+{
+    Normal,
+    TwoSeconds,
+    KeyPress,
 }
 
 public class FlowChartManager : ManagerBase
@@ -19,6 +29,8 @@ public class FlowChartManager : ManagerBase
     public Dictionary<string, Function> Functions { get; set; } = new();
     public List<Variable> ActiveVariables => Functions[_activeFunction].Variables;
     public List<Node> ActiveNodes => Functions[_activeFunction].Nodes;
+    public ExecutionType ExecutionType { get; set; } = ExecutionType.Normal;
+    public event Action<AppState, string> OnProjectStateChanged;
     public override Task<bool> Initialize()
     {
         New();
@@ -39,13 +51,41 @@ public class FlowChartManager : ManagerBase
         }
     }
     
-    public event Action<AppState> OnCodeStateChanged;
+    public string CurrentFile { get; private set; }
     public void New()
     {
         Functions.Clear();
         Functions.Add("Main", new Function());
+        CurrentFile = "";
+        OnProjectStateChanged?.Invoke(AppState.New, CurrentFile);
+    }
+
+    public void Save(string fileName)
+    {
+        CurrentFile = fileName;
+        AppManager.GetManager<IOManager>().Save(fileName + Ext, Functions);
+        OnProjectStateChanged?.Invoke(AppState.Save, CurrentFile);
+    }
+
+    public const string Ext = ".flw";
+    public void Load(string fileName)
+    {
+        CurrentFile = fileName;
+        Functions = AppManager.GetManager<IOManager>().Load($"{fileName}{Ext}");
+        foreach (var function in Functions)
+        {
+            foreach (var variable in function.Value.Variables)
+            {
+                AddVariable(variable);
+            }
+        }
         
-        OnCodeStateChanged?.Invoke(AppState.New);
+        OnProjectStateChanged?.Invoke(AppState.Load, CurrentFile);
+    }
+    
+    public void Compile()
+    {
+        OnProjectStateChanged?.Invoke(AppState.Compile, CurrentFile);
     }
     
     public void SetActiveFunction(string function)
@@ -79,9 +119,13 @@ public class FlowChartManager : ManagerBase
         variables.Remove(variable);
     }
     
+    private CancellationTokenSource _cts;
     public void Run()
     {
-        Functions["Main"].Execute();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        Functions["Main"].Execute(_cts);
+        OnProjectStateChanged?.Invoke(AppState.Run, CurrentFile);
     }
     
     public void AddNode(Node node)
@@ -90,4 +134,9 @@ public class FlowChartManager : ManagerBase
     }
 
     public Node GetNode(string nextMainNode) => Functions[_activeFunction].Nodes.Find(x => x.ID == nextMainNode);
+
+    public void StopExecution()
+    {
+        _cts.Cancel();
+    }
 }

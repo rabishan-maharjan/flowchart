@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
 
@@ -33,7 +34,7 @@ public class OperationCommand : Command
         Name = "OperationCommand";
     }
     
-    public override Task Execute()
+    public override async Task Execute(CancellationTokenSource cts)
     {
         try
         {
@@ -57,14 +58,13 @@ public class OperationCommand : Command
 
             flowChartManager.VariableMap[Variable].Value = result.Value;
 
+            await Wait(cts);
             Completed = true;
         }
         catch (Exception e)
         {
             Log.AddException(e);
         }
-        
-        return Task.CompletedTask;
     }
 
     public override string GetDescription()
@@ -76,6 +76,21 @@ public class OperationCommand : Command
         {
             var v1 = flowChartManager.VariableMap[expression.Variable];
             output += $"{v1.Name}";
+            if(!string.IsNullOrEmpty(expression.Operator)) output += $" {expression.Operator} ";
+        }
+
+        return string.IsNullOrEmpty(output) ? "Operation" : output;
+    }
+    
+    public override string GetValue()
+    {
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        var v = flowChartManager.VariableMap[Variable];
+        var output = $"{v.Name}:{v.Value} = ";
+        foreach (var expression in Expressions)
+        {
+            var v1 = flowChartManager.VariableMap[expression.Variable];
+            output += $"{v1.Name}:{v1.Value}";
             if(!string.IsNullOrEmpty(expression.Operator)) output += $" {expression.Operator} ";
         }
 

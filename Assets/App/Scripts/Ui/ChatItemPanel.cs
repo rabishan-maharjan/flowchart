@@ -1,7 +1,9 @@
-﻿using Arcube;
+﻿using System.Collections;
+using Arcube;
 using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChatItemPanel : Panel
 {
@@ -15,5 +17,13 @@ public class ChatItemPanel : Panel
     {
         t_text.text = text;
         t_text.color = color;
+
+        StartCoroutine(ForceRebuild());
+    }
+    
+    private IEnumerator ForceRebuild()
+    {
+        yield return null; // wait 1 frame
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }
 }

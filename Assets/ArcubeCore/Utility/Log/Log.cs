@@ -211,8 +211,6 @@ namespace Arcube
 
         private static void HandleLog(string condition, string stackTrace, UnityEngine.LogType type)
         {
-            if(type == UnityEngine.LogType.Exception) AddError(() => $"{condition} {type} \n{stackTrace}", "System");
-            
             if (!Instance.LOGSettings.saveLogs) return;
 
             if (type is not (UnityEngine.LogType.Error or UnityEngine.LogType.Exception)) return;

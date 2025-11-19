@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
@@ -32,7 +33,7 @@ public class LogicCommand : Command
         Name = "LogicCommand";
     }
 
-    public override async Task Execute()
+    public override async Task Execute(CancellationTokenSource cts)
     {
         Debug.Log("Executing " + Name);
 
@@ -55,12 +56,13 @@ public class LogicCommand : Command
             }
         }
 
+        await Wait(cts);
         if (overallResult)
         {
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeTrue);
             if (node is Command command)
             {
-                await command.Execute();
+                await command.Execute(cts);
             }
         }
         else
@@ -68,10 +70,11 @@ public class LogicCommand : Command
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeFalse);
             if (node is Command command)
             {
-                await command.Execute();
+                await command.Execute(cts);
             }
         }
 
+        await Wait(cts);
         Completed = true;
     }
 
@@ -85,6 +88,22 @@ public class LogicCommand : Command
             var v2 = flowChartManager.VariableMap[expression.Variable2];
 
             output += $"{v1.Name} {expression.Operator} {v2.Name}";
+            if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) output += $" {expression.ConjunctionOperator}\n";
+        }
+
+        return string.IsNullOrEmpty(output) ? "Logic" : output;
+    }
+    
+    public override string GetValue()
+    {
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        var output = "";
+        foreach (var expression in Expressions)
+        {
+            var v1 = flowChartManager.VariableMap[expression.Variable1];
+            var v2 = flowChartManager.VariableMap[expression.Variable2];
+
+            output += $"{v1.Name}:{v1.Value} {expression.Operator} {v2.Name}:{v2.Value}";
             if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) output += $" {expression.ConjunctionOperator}\n";
         }
 
