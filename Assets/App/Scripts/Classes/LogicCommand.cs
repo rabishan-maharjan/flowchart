@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
-using UnityEngine;
+using Newtonsoft.Json;
 
 public class LogicExpression
 {
@@ -33,11 +33,12 @@ public class LogicCommand : Command
         Name = "LogicCommand";
     }
 
+    [JsonIgnore] private bool _result;
     public override async Task Execute(CancellationTokenSource cts)
     {
-        Debug.Log("Executing " + Name);
+        OnExecuteStart?.Invoke();
 
-        var overallResult = Expressions.Count <= 0 || Expressions[0].Execute();
+        _result = Expressions.Count <= 0 || Expressions[0].Execute();
 
         for (var i = 1; i < Expressions.Count; i++)
         {
@@ -46,23 +47,23 @@ public class LogicCommand : Command
 
             if (prevConjunction == "and")
             {
-                overallResult = overallResult && currentResult;
-                if (!overallResult) break; // Short-circuit for AND
+                _result = _result && currentResult;
+                if (!_result) break; // Short-circuit for AND
             }
             else if (prevConjunction == "or")
             {
-                overallResult = overallResult || currentResult;
-                if (overallResult) break; // Short-circuit for OR
+                _result = _result || currentResult;
+                if (_result) break; // Short-circuit for OR
             }
         }
 
         await Wait(cts);
-        if (overallResult)
+        if (_result)
         {
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeTrue);
             if (node is Command command)
             {
-                await command.Execute(cts);
+                await ExecuteBranchItems(command, cts);
             }
         }
         else
@@ -70,12 +71,35 @@ public class LogicCommand : Command
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeFalse);
             if (node is Command command)
             {
-                await command.Execute(cts);
+                await ExecuteBranchItems(command, cts);
             }
         }
 
         await Wait(cts);
         Completed = true;
+        OnExecuteEnd?.Invoke();
+    }
+    
+    private async Task ExecuteBranchItems(Node node, CancellationTokenSource cts)
+    {
+        var flowChartManager = AppManager.GetManager<FlowChartManager>();
+        while (node != null)
+        {
+            if (node is Command command)
+            {
+                await command.Execute(cts);
+                await Task.Yield();
+            }
+
+            if (!string.IsNullOrEmpty(node.NextNode))
+            {
+                node = flowChartManager.GetNode(node.NextNode);
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     public override string GetDescription()
@@ -94,18 +118,23 @@ public class LogicCommand : Command
         return string.IsNullOrEmpty(output) ? "Logic" : output;
     }
     
-    public override string GetValue()
+    public override string GetValueDescription()
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
-        var output = "";
+        var output = GetDescription() + "\n";
         foreach (var expression in Expressions)
         {
             var v1 = flowChartManager.VariableMap[expression.Variable1];
             var v2 = flowChartManager.VariableMap[expression.Variable2];
 
-            output += $"{v1.Name}:{v1.Value} {expression.Operator} {v2.Name}:{v2.Value}";
+            output += $"({v1.Name}:{v1.Value} {expression.Operator}";
+            if(v2.Exposed) output += $" {v2.Name}:{v2.Value})";
+            else output += $" {v2.Value})";
+            
             if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) output += $" {expression.ConjunctionOperator}\n";
         }
+        
+        output += $" = {_result}";
 
         return string.IsNullOrEmpty(output) ? "Logic" : output;
     }

@@ -25,8 +25,22 @@ public class OperationCommandUi : CommandUi
         base.Reset();
     }
 
+    protected override void Start()
+    {
+        dr_variable.onValueChanged.AddListener(value =>
+        {
+            //reset exposed variables in list
+            foreach (var e in GetComponentsInChildren<OperatorExpressionPanel>())
+            {
+                var variables = _exposedVariables.Where(v => v.Type == _exposedVariables[value].Type && v.Type != VariableType.Bool).ToList();
+                e.Set(variables, _exposedVariables[value], "");
+            }
+        });
+        
+        base.Start();
+    }
+
     [SerializeField] private Transform list;
-    
     private List<Variable> _allVariables;
     private List<Variable> _exposedVariables;
     private FlowChartManager _flowChartManager;

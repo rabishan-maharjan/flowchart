@@ -11,11 +11,6 @@ public class Node
     {
         ID = Guid.NewGuid().ToString();
     }
-
-    public virtual void Connect(Node node)
-    {
-        NextNode = node.ID;
-    }
 }
 
 public class StartNode : Node

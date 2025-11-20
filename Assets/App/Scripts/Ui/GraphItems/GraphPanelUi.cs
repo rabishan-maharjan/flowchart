@@ -6,6 +6,7 @@ using Arcube.AssetManagement;
 using Arcube.UiManagement;
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class GraphPanelUi : Ui
@@ -15,26 +16,24 @@ public class GraphPanelUi : Ui
     public override Task Register()
     {
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
-        _flowChartManager.OnProjectStateChanged += HandleCodeStateChanged;
+        _flowChartManager.OnProjectStateChanged += HandleProjectStateChanged;
+        _flowChartManager.OnCompileStateChanged += HandleCompileStateChanged;
         return base.Register();
     }
 
-    private async void HandleCodeStateChanged(AppState state, string projectName)
+    private async void HandleProjectStateChanged(ProjectState state, string projectName)
     {
         try
         {
             switch (state)
             {
-                case AppState.New:
+                case ProjectState.New:
                 {
                     await New();
                     break;
                 }
-                case AppState.Load:
+                case ProjectState.Load:
                     await GenerateFlowChart(_flowChartManager.Functions);
-                    break;
-                case AppState.Compile:
-                    GenerateCode();
                     break;
             }
         }
@@ -42,6 +41,13 @@ public class GraphPanelUi : Ui
         {
             Log.AddException(e);
         }
+    }
+    
+    private void HandleCompileStateChanged(CompileState compileState)
+    {
+        if (compileState != CompileState.Compile) return;
+        Selected = null;
+        GenerateCode();
     }
 
     private async Task New()
@@ -129,19 +135,19 @@ public class GraphPanelUi : Ui
     }
 
     [Button]
-    public void GenerateCode()
+    private void GenerateCode()
     {
         _flowChartManager.ClearNodes();
         
         foreach (var nodeObject in GetComponentsInChildren<NodeObject>())
         {
-            nodeObject.GenerateCode(_flowChartManager);
+            nodeObject.GenerateCode();
         }
         
         //Debug.Log(JsonConvert.SerializeObject(_flowChartManager.Functions, Formatting.Indented));
     }
 
-    public async Task GenerateFlowChart(Dictionary<string, Function> functions)
+    private async Task GenerateFlowChart(Dictionary<string, Function> functions)
     {
         foreach (var nodeObject in GetComponentsInChildren<NodeObject>())
         {
@@ -153,7 +159,7 @@ public class GraphPanelUi : Ui
         {
             foreach (var node in function.Value.Nodes)
             {
-                Debug.Log($"Instantiating {node.Name}");
+                //Debug.Log($"Instantiating {node.Name}");
                 var obj = await AssetManager.Instantiate<NodeObject>(node.Name, container);
                 obj.Node = node;
                 if (node is Command command)

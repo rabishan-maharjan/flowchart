@@ -3,15 +3,11 @@ using UnityEngine.EventSystems;
 
 public class GraphObject : PanelItem, IPointerClickHandler
 {
-    protected GraphPanelUi GraphPanelUi;
-    protected override void Awake()
-    {
-        base.Awake();
-        GraphPanelUi = GetComponentInParent<GraphPanelUi>();
-    }
-    
+    protected bool Editable = true;
     public virtual void OnPointerClick(PointerEventData eventData)
     {
+        if(!Editable) return;
+        
         Select();
     }
 
@@ -22,6 +18,8 @@ public class GraphObject : PanelItem, IPointerClickHandler
 
     public virtual void Delete(bool force)
     {
+        if(!Editable) return;
+        
         Destroy(gameObject);
     }
 }

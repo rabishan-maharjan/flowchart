@@ -1,16 +1,21 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public abstract class Command : Node
 {
+    [JsonIgnore] public Action OnExecuteStart;
+    [JsonIgnore] public Action OnExecuteEnd;
     public bool Completed { get; set; } = false;
     public abstract Task Execute(CancellationTokenSource cts);
 
+    [JsonIgnore] protected string Description;
     public abstract string GetDescription();
     
-    public abstract string GetValue();
+    public abstract string GetValueDescription();
 
     protected async Task Wait(CancellationTokenSource cts)
     {
@@ -23,7 +28,7 @@ public abstract class Command : Node
                 await Task.Delay(2000, cts.Token);
                 break;
             case ExecutionType.KeyPress:
-                while (!Input.anyKeyDown)
+                while (!Input.GetKeyDown(KeyCode.N))
                 {
                     await Task.Yield();
                     cts.Token.ThrowIfCancellationRequested();

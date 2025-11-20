@@ -14,7 +14,7 @@ public class Function
     public static Action<string> OnOutput;
     public static event Action<string> OnError;
     public static Node ActiveNode { get; private set; }
-    public async void Execute(CancellationTokenSource cts)
+    public async Task Execute(CancellationTokenSource cts)
     {
         var backup = Variables.ConvertAll(v => new Variable(v));
         try

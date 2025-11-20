@@ -22,15 +22,16 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     private RectTransform _rectTransform;
     private Canvas _canvas;
     private Vector2 _dragOffset;
-
+    protected FlowChartManager FlowChartManager;
     protected override void Awake()
     {
         base.Awake();
         _rectTransform = GetComponent<RectTransform>();
         _canvas = GetComponentInParent<Canvas>();
+        FlowChartManager = AppManager.GetManager<FlowChartManager>();
     }
 
-    private IEnumerator Start()
+    protected virtual IEnumerator Start()
     {
         yield return null;
         yield return null;
@@ -40,10 +41,10 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
 
-    public void SetText(string text) => Text = text;
-
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if(!Editable) return;
+        
         if (!_rectTransform || !_canvas) return;
 
         // Calculate the initial offset between the pointer and the object's position
@@ -58,6 +59,8 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
     public virtual void OnDrag(PointerEventData eventData)
     {
+        if(!Editable) return;
+        
         if (!_rectTransform || !_canvas) return;
 
         // Adjust the position of the RectTransform based on the drag event
@@ -74,6 +77,8 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
     protected override void Select()
     {
+        if(!Editable) return;
+        
         if (GraphPanelUi.Selected is ConnectorObject connectorObject)
         {
             if (CanConnect(connectorObject))
@@ -84,10 +89,12 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
         base.Select();
     }
-    
+
     //connection from connector object to node
     protected virtual bool CanConnect(ConnectorObject connectorObject)
     {
+        if(!Editable) return false;
+        
         if(connectorObject.NextNodeObject == this)
         {
             //no need to connect
@@ -144,7 +151,7 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         base.Delete(force);
     }
 
-    public virtual void GenerateCode(FlowChartManager flowChartManager)
+    public virtual void GenerateCode()
     {
         if (ConnectorObject && ConnectorObject.NextNodeObject)
         {
@@ -155,6 +162,6 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
             }
         }
         
-        flowChartManager.AddNode(Node);
+        FlowChartManager.AddNode(Node);
     }
 }

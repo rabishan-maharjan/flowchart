@@ -11,10 +11,10 @@ public class OutputCommand : Command
     {
         Name = "OutputCommand";
     }
-
     [JsonIgnore] private string Output { get; set; }
     public override async Task Execute(CancellationTokenSource cts)
     {
+        OnExecuteStart?.Invoke();
         Output = "";
         foreach (var variable in Variables)
         {
@@ -30,35 +30,38 @@ public class OutputCommand : Command
                 Output += v.Value;
             }
         }
-     
-        //Debug.Log($"Output: {Output}");
+        
         Function.OnOutput.Invoke(Output);
         
         await Wait(cts);
         Completed = true;
+        OnExecuteEnd?.Invoke();
     }
 
     public override string GetDescription()
     {
-        var output = "Output\n";
+        Description = "Output\n";
         foreach (var variable in Variables)
         {
-            output += Variable.TryGetVariable(variable)?.Name;
+            Description += Variable.TryGetVariable(variable)?.Name + " + ";
         }
         
-        return output;
+        if (Variables.Count > 0) Description = Description[..^3];
+        
+        return Description;
     }
     
-    public override string GetValue()
+    public override string GetValueDescription()
     {
-        var output = "Output\n";
+        Description = GetDescription() + "\n";
         foreach (var variable in Variables)
         {
             var v = Variable.TryGetVariable(variable);
-            if(v == null) continue;
-            output += v.Name + " = " + v.Value;
+            if(v.Exposed) Description += v.Name + ":" + v.Value + ",";
         }
         
-        return output;
+        Description = Description.TrimEnd(',');
+        
+        return Description;
     }
 }

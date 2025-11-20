@@ -32,3 +32,4 @@ MonoBehaviour:
       Value: {r: 0, g: 0.1764706, b: 1, a: 1}
     - Key: LoopCommand
       Value: {r: 0.8784314, g: 0, b: 1, a: 1}
+  highlightColor: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 1}

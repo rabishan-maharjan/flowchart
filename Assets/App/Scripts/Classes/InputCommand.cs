@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Arcube;
 
 public class InputCommand : Command
 {
@@ -13,6 +12,7 @@ public class InputCommand : Command
     public string Variable { get; set; }
     public override async Task Execute(CancellationTokenSource cts)
     {
+        OnExecuteStart?.Invoke();
         if (string.IsNullOrEmpty(Variable))
         {
             throw new Exception("Variable is null");
@@ -23,17 +23,20 @@ public class InputCommand : Command
             await Task.Yield();
             cts.Token.ThrowIfCancellationRequested();
         }
+        OnExecuteEnd?.Invoke();
     }
 
     public override string GetDescription()
     {
-        var v = AppManager.GetManager<FlowChartManager>().VariableMap[Variable];
-        return $"Input {v.Name}";
+        var v = global::Variable.TryGetVariable(Variable);
+        return v == null ? "Input" : $"Input {v.Name}";
     }
     
-    public override string GetValue()
+    public override string GetValueDescription()
     {
-        var v = AppManager.GetManager<FlowChartManager>().VariableMap[Variable];
-        return $"Input {v.Name} = {v.Value}";
+        var v = global::Variable.TryGetVariable(Variable);
+        if (v == null) return "Input";
+        Description = $"{GetDescription()}\n{v.Value}";
+        return Description;
     }
 }

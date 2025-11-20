@@ -64,6 +64,7 @@ public class MenuPanel : MonoBehaviour
             
             _flowChartManager.Compile();
             _flowChartManager.Save(fileName);
+            _flowChartManager.Work();
         }
         catch (Exception e)
         {

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
@@ -48,7 +49,7 @@ public class LogicNodeObject : CommandObject
         return base.CanConnect(connectorObject);
     }
 
-    public override void GenerateCode(FlowChartManager flowChartManager)
+    public override void GenerateCode()
     {
         if (connectorFalse && connectorFalse.NextNodeObject)
         {
@@ -70,14 +71,17 @@ public class LogicNodeObject : CommandObject
             }
         }
         
-        base.GenerateCode(flowChartManager);
+        base.GenerateCode();
     }
     
     [SerializeField] private DynamicLineDrawer pivot;
-    private void Start()
+
+    protected override IEnumerator Start()
     {
         _= pivot.Set((RectTransform)ConnectorObject.transform);
+        yield return base.Start();
     }
+    
     private void Update()
     {
         var connector1 = connectorTrue;

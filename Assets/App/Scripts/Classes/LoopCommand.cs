@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
+using Newtonsoft.Json;
 
 public class LoopCommand : Command
 {
@@ -16,6 +18,7 @@ public class LoopCommand : Command
     public int Steps = 1;
     public override async Task Execute(CancellationTokenSource cts)
     {
+        OnExecuteStart?.Invoke();
         //get all commands after this command
         //execute them
         Variable v = null;
@@ -33,7 +36,7 @@ public class LoopCommand : Command
         }
         else
         {
-            for (var i = 0; i < Count; i += Steps)
+            for (var i = 1; i <= Count; i += Steps)
             {
                 if (v != null)
                 {
@@ -44,8 +47,10 @@ public class LoopCommand : Command
         }
      
         Completed = true;
+        OnExecuteEnd?.Invoke();
     }
-    
+
+    [JsonIgnore] public Action OnLoopStep;
     private async Task ExecuteLoopItems(CancellationTokenSource cts)
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
@@ -57,6 +62,7 @@ public class LoopCommand : Command
                 //Debug.Log($"Executing {command.Name} from loop");
                 await command.Execute(cts);
                 await Task.Yield();
+                OnLoopStep?.Invoke();
             }
 
             if (!string.IsNullOrEmpty(node.NextNode))
@@ -78,11 +84,11 @@ public class LoopCommand : Command
         else output += "\n";
         output += $" Count {Count}\n";
         output += $" Steps {Steps}\n";
-        output += $" Reverse {Reverse}\n";
+        output += Reverse ? "Desc\n" : "Asc\n";
         return output;
     }
     
-    public override string GetValue()
+    public override string GetValueDescription()
     {
         var output = "Loop";
         var v = global::Variable.TryGetVariable(Variable);
@@ -90,7 +96,7 @@ public class LoopCommand : Command
         else output += "\n";
         output += $" Count {Count}\n";
         output += $" Steps {Steps}\n";
-        output += $" Reverse {Reverse}\n";
+        output += Reverse ? "Desc\n" : "Asc\n";
         return output;
     }
 }

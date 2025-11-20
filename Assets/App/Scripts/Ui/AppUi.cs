@@ -23,14 +23,14 @@ public class AppUi : Ui
         {
             switch (state)
             {
-                case AppState.New:
+                case ProjectState.New:
                     variableListPanel.Clear();
                     SetTitle("New Project");
                     break;
-                case AppState.Save:
+                case ProjectState.Save:
                     SetTitle(projectName);
                     break;
-                case AppState.Load:
+                case ProjectState.Load:
                     variableListPanel.Clear();
                     foreach (var variable in flowChartManager.VariableMap)
                     {
