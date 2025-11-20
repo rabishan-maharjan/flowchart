@@ -56,6 +56,8 @@ public class LogicCommand : Command
                 if (_result) break; // Short-circuit for OR
             }
         }
+        
+        OnExecuteEnd?.Invoke();
 
         await Wait(cts);
         if (_result)
@@ -77,7 +79,6 @@ public class LogicCommand : Command
 
         await Wait(cts);
         Completed = true;
-        OnExecuteEnd?.Invoke();
     }
     
     private async Task ExecuteBranchItems(Node node, CancellationTokenSource cts)
@@ -120,21 +121,8 @@ public class LogicCommand : Command
     
     public override string GetValueDescription()
     {
-        var flowChartManager = AppManager.GetManager<FlowChartManager>();
         var output = GetDescription() + "\n";
-        foreach (var expression in Expressions)
-        {
-            var v1 = flowChartManager.VariableMap[expression.Variable1];
-            var v2 = flowChartManager.VariableMap[expression.Variable2];
-
-            output += $"({v1.Name}:{v1.Value} {expression.Operator}";
-            if(v2.Exposed) output += $" {v2.Name}:{v2.Value})";
-            else output += $" {v2.Value})";
-            
-            if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) output += $" {expression.ConjunctionOperator}\n";
-        }
-        
-        output += $" = {_result}";
+        output += $"{_result}";
 
         return string.IsNullOrEmpty(output) ? "Logic" : output;
     }

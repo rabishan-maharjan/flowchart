@@ -19,9 +19,9 @@ MonoBehaviour:
   colors:
     _serializedList:
     - Key: StartNode
-      Value: {r: 0.34901962, g: 0.9607843, b: 0.87058824, a: 1}
+      Value: {r: 0.3647059, g: 0.67058825, b: 1, a: 1}
     - Key: EndNode
-      Value: {r: 0.34901962, g: 0.9607843, b: 0.87058824, a: 1}
+      Value: {r: 0.3647059, g: 0.67058825, b: 1, a: 1}
     - Key: InputCommand
       Value: {r: 0.7764706, g: 1, b: 0, a: 1}
     - Key: OutputCommand
@@ -30,6 +30,8 @@ MonoBehaviour:
       Value: {r: 1, g: 0.7176471, b: 0, a: 1}
     - Key: LogicCommand
       Value: {r: 0, g: 0.1764706, b: 1, a: 1}
-    - Key: LoopCommand
+    - Key: ForLoopCommand
       Value: {r: 0.8784314, g: 0, b: 1, a: 1}
-  highlightColor: {r: 0.5849056, g: 0.5849056, b: 0.5849056, a: 1}
+    - Key: WhileLoopCommand
+      Value: {r: 0.8784314, g: 0, b: 1, a: 1}
+  highlightColor: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}

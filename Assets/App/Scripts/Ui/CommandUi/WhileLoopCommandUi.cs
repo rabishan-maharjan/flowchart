@@ -1,20 +1,19 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LogicCommandUi : CommandUi
+public class WhileLoopCommandUi : CommandUi
 {
     [SerializeField] private LogicExpressionPanel logicExpressionPrefab;
     [SerializeField] private Transform list;
 
+    private FlowChartManager _flowChartManager;
     private List<Variable> _allVariables;
     private List<Variable> _exposedVariables;
-    private FlowChartManager _flowChartManager;
     protected override void SetUi()
     {
         try
@@ -23,19 +22,21 @@ public class LogicCommandUi : CommandUi
             {
                 Destroy(e.gameObject);
             }
-            
+
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;
             _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
-            
+
             //load old variables
-            var logicCommand = (LogicCommand)Command;
-            foreach (var expression in logicCommand.Expressions)
+            var loopCommand = (WhileLoopCommand)Command;
+            foreach (var expression in loopCommand.Expressions)
             {
                 AddField(expression);
             }
-            
-            if(logicCommand.Expressions.Count == 0) AddField(new LogicExpression());
+
+            if (loopCommand.Expressions.Count == 0) AddField(new LogicExpression());
+
+            base.SetUi();
         }
         catch(Exception e)
         {
@@ -91,8 +92,8 @@ public class LogicCommandUi : CommandUi
             return;
         }
 
-        var logicCommand = (LogicCommand)Command;
-        logicCommand.Expressions.Clear();
+        var loopCommand = (WhileLoopCommand)Command;
+        loopCommand.Expressions.Clear();
 
         for (var i = 0; i < list.childCount; i++)
         {
@@ -120,7 +121,7 @@ public class LogicCommandUi : CommandUi
                 return;
             }
             
-            logicCommand.Expressions.Add(new LogicExpression()
+            loopCommand.Expressions.Add(new LogicExpression()
             {
                 Variable1 = v1.ID,
                 Variable2 = v2.ID,

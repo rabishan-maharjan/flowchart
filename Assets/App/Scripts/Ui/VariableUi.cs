@@ -111,10 +111,14 @@ public class VariableUi : Ui
         if (_variable.Type == VariableType.Dynamic)
         {
             _variable.Type = Variable.DetectType(ip_value.Text);
+            if (_variable.Type == VariableType.Bool)
+            {
+                tb_value.IsOn = ip_value.Text == "true";
+            }
         }
         
         if(_variable.Type != VariableType.Bool) _variable.Value = ip_value.Text;
-        else _variable.Value = tb_value ? "true" : "false";
+        else _variable.Value = tb_value.IsOn ? "true" : "false";
         
         _variable.Assigned = true;
         _variable.Exposed = true;

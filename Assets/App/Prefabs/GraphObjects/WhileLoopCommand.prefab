@@ -789,12 +789,12 @@ GameObject:
   - component: {fileID: 8139191300586172368}
   - component: {fileID: 7822916073970448036}
   - component: {fileID: -3586097430188526578}
-  - component: {fileID: 8335222252332560191}
   - component: {fileID: 2383032636994659117}
   - component: {fileID: 3672270747825666785}
   - component: {fileID: 6505231597148256251}
+  - component: {fileID: 3206501030517563822}
   m_Layer: 5
-  m_Name: LoopCommand
+  m_Name: WhileLoopCommand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -877,26 +877,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8335222252332560191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8109109483387142334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8333da625b338049992662046a7c46b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LoopNodeObject
-  button: {fileID: -3586097430188526578}
-  <Image>k__BackingField: {fileID: 8175655005494746940}
-  _text: {fileID: 8905461171652719704}
-  <ConnectorObject>k__BackingField: {fileID: 8830094553371930808}
-  t_work: {fileID: 8905461171652719704}
-  t_compile: {fileID: 421144042200026934}
-  <ConnectorLoopObject>k__BackingField: {fileID: 7620465886604190278}
-  pivot: {fileID: 1714940017075039342}
 --- !u!114 &2383032636994659117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -957,6 +937,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &3206501030517563822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8109109483387142334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaa06bdd3eb644c5a1f33dea326de78a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WhileLoopNodeObject
+  button: {fileID: -3586097430188526578}
+  <Image>k__BackingField: {fileID: 8175655005494746940}
+  _text: {fileID: 8905461171652719704}
+  <ConnectorObject>k__BackingField: {fileID: 8830094553371930808}
+  t_work: {fileID: 8905461171652719704}
+  t_compile: {fileID: 421144042200026934}
+  <ConnectorLoopObject>k__BackingField: {fileID: 7620465886604190278}
+  pivot: {fileID: 1714940017075039342}
 --- !u!1001 &535676980617842143
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1064,7 +1064,7 @@ PrefabInstance:
     - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: <ParentNodeObject>k__BackingField
       value: 
-      objectReference: {fileID: 8335222252332560191}
+      objectReference: {fileID: 3206501030517563822}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -1156,7 +1156,7 @@ PrefabInstance:
     - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: <ParentNodeObject>k__BackingField
       value: 
-      objectReference: {fileID: 8335222252332560191}
+      objectReference: {fileID: 3206501030517563822}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

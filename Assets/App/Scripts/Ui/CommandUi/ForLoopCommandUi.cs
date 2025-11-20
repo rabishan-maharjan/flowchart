@@ -6,7 +6,7 @@ using Arcube.UiManagement;
 using TMPro;
 using UnityEngine;
 
-public class LoopCommandUi : CommandUi
+public class ForLoopCommandUi : CommandUi
 {
     [SerializeField] private TMP_Dropdown dr_variable;
     [SerializeField] private InputFieldSimple ip_count;
@@ -25,7 +25,7 @@ public class LoopCommandUi : CommandUi
     private List<Variable> _exposedVariables;
     public override Task Open(Command command)
     {
-        var loopCommand = (LoopCommand)command;
+        var loopCommand = (ForLoopCommand)command;
         ip_count.Text = loopCommand.Count.ToString();
         tb_reverse.IsOn = loopCommand.Reverse;
         ip_step.Text = loopCommand.Steps.ToString();
@@ -43,7 +43,7 @@ public class LoopCommandUi : CommandUi
 
     protected override void Apply()
     {
-        var loopCommand = (LoopCommand)Command;
+        var loopCommand = (ForLoopCommand)Command;
         
         int.TryParse(ip_count.Text, out loopCommand.Count);
         int.TryParse(ip_step.Text, out loopCommand.Steps);

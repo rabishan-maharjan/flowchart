@@ -53,14 +53,7 @@ public class OutputCommand : Command
     
     public override string GetValueDescription()
     {
-        Description = GetDescription() + "\n";
-        foreach (var variable in Variables)
-        {
-            var v = Variable.TryGetVariable(variable);
-            if(v.Exposed) Description += v.Name + ":" + v.Value + ",";
-        }
-        
-        Description = Description.TrimEnd(',');
+        Description = $"Output\n{Output}";
         
         return Description;
     }

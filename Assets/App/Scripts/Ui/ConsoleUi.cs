@@ -31,7 +31,7 @@ public class ConsoleUi : Ui
         Function.OnInput += value =>
         {
             _activeVariable = AppManager.GetManager<FlowChartManager>().VariableMap[value];
-            ip_input.contentType = _activeVariable.Type == VariableType.Number ? TMP_InputField.ContentType.DecimalNumber : TMP_InputField.ContentType.Alphanumeric;
+            ip_input.contentType = _activeVariable.Type == VariableType.Number ? TMP_InputField.ContentType.DecimalNumber : TMP_InputField.ContentType.Standard;
             ip_input.interactable = true;
             ip_input.Select();
         };

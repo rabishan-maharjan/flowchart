@@ -106,9 +106,13 @@ public class ConnectorObject : GraphObject
         {
             lastNodeObject?.CloseNode(logicNodeObject.ConnectorObject);    
         }
-        else if(branchConnector.ParentNodeObject is LoopNodeObject loopNode)
+        else if(branchConnector.ParentNodeObject is ForLoopNodeObject loopNode)
         {
             lastNodeObject?.CloseNode(loopNode.ConnectorLoopObject);
+        }
+        else if(branchConnector.ParentNodeObject is WhileLoopNodeObject whileLoopNode)
+        {
+            lastNodeObject?.CloseNode(whileLoopNode.ConnectorLoopObject);
         }
     }
 

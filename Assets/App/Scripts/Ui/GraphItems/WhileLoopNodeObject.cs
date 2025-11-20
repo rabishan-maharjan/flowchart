@@ -1,0 +1,77 @@
+﻿using System.Collections;
+using System.Threading.Tasks;
+using Arcube;
+using UnityEngine;
+
+public class WhileLoopNodeObject : CommandObject
+{
+    [field: SerializeField] public ConnectorObject ConnectorLoopObject { get; set; }
+    public override Node Node => _node ??= new WhileLoopCommand();
+
+    protected override async Task OpenCommandUi()
+    {
+        await UiManager.GetUi<WhileLoopCommandUi>().Open((WhileLoopCommand)Node);
+        await base.OpenCommandUi();
+    }
+
+    protected override bool CanConnect(ConnectorObject connectorObject)
+    {
+        if (!ConnectorLoopObject) return true;
+
+        if (ConnectorLoopObject.NextNodeObject == connectorObject.ParentNodeObject)
+        {
+            Debug.LogWarning("cyclical");
+            return false;
+        }
+
+        if (ConnectorLoopObject == connectorObject)
+        {
+            Debug.LogWarning("Self connection");
+            return false;
+        }
+
+        return base.CanConnect(connectorObject);
+    }
+
+    public override void GenerateCode()
+    {
+        if (ConnectorLoopObject && ConnectorLoopObject.NextNodeObject)
+        {
+            var loopCommand = (WhileLoopCommand)Node;
+            var nextNode = ConnectorLoopObject.NextNodeObject.Node;
+            if (nextNode != null)
+            {
+                loopCommand.NodeLoop = nextNode.ID;
+            }
+        }
+
+        base.GenerateCode();
+    }
+
+    [SerializeField] private DynamicLineDrawer pivot;
+    protected override IEnumerator Start()
+    {
+        yield return base.Start();
+        _= pivot.Set((RectTransform)ConnectorObject.transform);
+        var loopCommand =(WhileLoopCommand)Node; 
+        loopCommand.OnLoopStep += () =>
+        {
+            t_compile.text = loopCommand.GetValueDescription();
+        };
+    }
+    
+    private void Update()
+    {
+        var connector = ConnectorLoopObject;
+        while (connector)
+        {
+            if (connector.NextNodeObject) connector = connector.NextNodeObject.ConnectorObject;
+            else break;
+        }
+
+        if(!connector || connector == ConnectorLoopObject) return;
+        
+        var brt = connector.transform;
+        ConnectorObject.transform.position = new Vector3(transform.position.x, brt.transform.position.y - 50);
+    }
+}

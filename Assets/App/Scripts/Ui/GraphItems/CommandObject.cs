@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public abstract class CommandObject : NodeObject
 {
     [SerializeField] private TMP_Text t_work;
-    [FormerlySerializedAs("t_command")] [SerializeField] private TMP_Text t_compile;
+    [FormerlySerializedAs("t_command")] [SerializeField] protected TMP_Text t_compile;
     protected override void Reset()
     {
         transform.TryFindObject(nameof(t_work), out t_work);
@@ -29,7 +29,7 @@ public abstract class CommandObject : NodeObject
     {
         Editable = state == CompileState.Work;
         
-        if(state == CompileState.Run) t_compile.text = Command.GetDescription();
+        t_compile.text = Command.GetDescription();
         
         t_work.gameObject.SetActive(state != CompileState.Run);
         t_compile.gameObject.SetActive(state == CompileState.Run);
@@ -46,6 +46,7 @@ public abstract class CommandObject : NodeObject
     private void HandleExecutionEnd()
     {
         t_compile.text = Command.GetValueDescription();
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)t_compile.transform);
         t_compile.gameObject.SetActive(true);
         Highlight(false);
     }

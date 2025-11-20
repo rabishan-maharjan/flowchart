@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
-public class LoopNodeObject : CommandObject
+public class ForLoopNodeObject : CommandObject
 {
     [field: SerializeField] public ConnectorObject ConnectorLoopObject { get; set; }
-    public override Node Node => _node ??= new LoopCommand();
+    public override Node Node => _node ??= new ForLoopCommand();
 
     protected override async Task OpenCommandUi()
     {
-        await UiManager.GetUi<LoopCommandUi>().Open((LoopCommand)Node);
+        await UiManager.GetUi<ForLoopCommandUi>().Open((ForLoopCommand)Node);
         await base.OpenCommandUi();
     }
 
@@ -37,7 +37,7 @@ public class LoopNodeObject : CommandObject
     {
         if (ConnectorLoopObject && ConnectorLoopObject.NextNodeObject)
         {
-            var loopCommand = (LoopCommand)Node;
+            var loopCommand = (ForLoopCommand)Node;
             var nextNode = ConnectorLoopObject.NextNodeObject.Node;
             if (nextNode != null)
             {
@@ -53,10 +53,10 @@ public class LoopNodeObject : CommandObject
     {
         yield return base.Start();
         _= pivot.Set((RectTransform)ConnectorObject.transform);
-        var loopCommand =(LoopCommand)Node; 
+        var loopCommand =(ForLoopCommand)Node; 
         loopCommand.OnLoopStep += () =>
         {
-            Text = loopCommand.GetValueDescription();
+            t_compile.text = loopCommand.GetValueDescription();
         };
     }
     

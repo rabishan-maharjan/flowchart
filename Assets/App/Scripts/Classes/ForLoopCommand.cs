@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Arcube;
 using Newtonsoft.Json;
 
-public class LoopCommand : Command
+public class ForLoopCommand : Command
 {
     public string NodeLoop;
-    public LoopCommand()
+    public ForLoopCommand()
     {
-        Name = "LoopCommand";
+        Name = "ForLoopCommand";
     }
 
     public string Variable;

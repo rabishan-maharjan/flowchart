@@ -213,18 +213,33 @@ public class GraphPanelUi : Ui
                         }
                     }
                 }
-                else if (node is LoopCommand loopCommand)
+                else if (node is ForLoopCommand forLoopCommand)
                 {
-                    if (loopCommand.NodeLoop != null)
+                    if (forLoopCommand.NodeLoop != null)
                     {
-                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == loopCommand.NodeLoop);
+                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == forLoopCommand.NodeLoop);
                         if (nextNodeObject)
                         {
-                            ((LoopNodeObject)nodeObject).ConnectorLoopObject.Connect(nextNodeObject);
+                            ((ForLoopNodeObject)nodeObject).ConnectorLoopObject.Connect(nextNodeObject);
                         }
                         else
                         {
-                            Debug.Log($"Next node not found {loopCommand.NodeLoop}");
+                            Debug.Log($"Next node not found {forLoopCommand.NodeLoop}");
+                        }
+                    }
+                }
+                else if (node is WhileLoopCommand whileLoopCommand)
+                {
+                    if (whileLoopCommand.NodeLoop != null)
+                    {
+                        var nextNodeObject = nodesObjects.Find(x => x.Node.ID == whileLoopCommand.NodeLoop);
+                        if (nextNodeObject)
+                        {
+                            ((WhileLoopNodeObject)nodeObject).ConnectorLoopObject.Connect(nextNodeObject);
+                        }
+                        else
+                        {
+                            Debug.Log($"Next node not found {whileLoopCommand.NodeLoop}");
                         }
                     }
                 }
