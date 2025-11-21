@@ -126,7 +126,7 @@ public class WhileLoopCommandUi : CommandUi
                 Variable1 = v1.ID,
                 Variable2 = v2.ID,
                 Operator = OperatorHandler.LogicOperators[logicExpressionPanel.dr_operator.value],
-                ConjunctionOperator = logicExpressionPanel.dr_next_logic_operator.value > 0 ? OperatorHandler.ConjunctionOperators[logicExpressionPanel.dr_next_logic_operator.value - 1] : "",
+                ConjunctionOperator = logicExpressionPanel.dr_next_logic_operator.value > 0 ? OperatorHandler.BooleanOperators[logicExpressionPanel.dr_next_logic_operator.value - 1] : "",
             });
         }
         

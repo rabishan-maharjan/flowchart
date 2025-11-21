@@ -1094,6 +1094,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7077609043315114073}
     - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
+      propertyPath: <NextNodeOffset>k__BackingField.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: <ParentNodeObject>k__BackingField
       value: 
       objectReference: {fileID: 7077609043315114073}
@@ -1306,6 +1310,10 @@ PrefabInstance:
       propertyPath: nodeObject
       value: 
       objectReference: {fileID: 7077609043315114073}
+    - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
+      propertyPath: <NextNodeOffset>k__BackingField.x
+      value: -100
+      objectReference: {fileID: 0}
     - target: {fileID: 7975397998485237657, guid: 3d96419af8f55264785e30dcb61514db, type: 3}
       propertyPath: <ParentNodeObject>k__BackingField
       value: 

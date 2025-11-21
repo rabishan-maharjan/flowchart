@@ -16,6 +16,8 @@ public class ConnectorObject : GraphObject
     [SerializeField] private NodeType nodeType = NodeType.Flow;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
     public NodeObject NextNodeObject { get; private set; }
+    
+    [field: SerializeField] public Vector2 NextNodeOffset { get; set; }
 
     protected override void Reset()
     {
@@ -23,9 +25,57 @@ public class ConnectorObject : GraphObject
         base.Reset();
     }
 
+    public RectTransform RectTransform { get; private set; }
     private void Start()
     {
+        RectTransform = GetComponent<RectTransform>();
         GetComponent<ButtonImage>().OnClick.AddListener(Select);
+    }
+    
+    private async void CreateNode()
+    {
+        try
+        {
+            var nodeSelectUi = UiManager.GetUi<NodeSelectUi>();
+            if (nodeSelectUi.State is UiState.Opened or UiState.Opening)
+            {
+                nodeSelectUi.Close();
+                return;
+            }
+        
+            // Get RectTransform of the container (the parent you instantiate into)
+            var containerRect = ParentNodeObject.transform.parent.GetComponent<RectTransform>();
+            if (!containerRect) return;
+
+            // Choose the correct camera for ScreenPointToLocalPointInRectangle
+            // Show node selection UI (await)
+            await nodeSelectUi.OpenAsync();
+            var newNodePrefab = nodeSelectUi.Selected;
+            if (!newNodePrefab) return;
+
+            // Instantiate under container
+            var nodeObject = Instantiate(newNodePrefab, containerRect);
+            var nodeRect = nodeObject.GetComponent<RectTransform>();
+            if (!nodeRect) return;
+
+            // Ensure scale is correct (prefab import sometimes has wrong scale)
+            nodeRect.localScale = Vector3.one;
+
+            // Set anchoredPosition to the local point we calculated
+            nodeRect.anchoredPosition = ((RectTransform)ParentNodeObject.transform).anchoredPosition + NextNodeOffset;
+
+            if (!branchNode && NextNodeObject)
+            {
+                nodeObject.ConnectorObject.Connect(NextNodeObject);
+                nodeObject.MoveAllFollowingNodes(new Vector2(0, NextNodeOffset.y));
+            }
+            
+            Connect(nodeObject);
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     public override void Delete(bool force) => Clear();
@@ -159,6 +209,14 @@ public class ConnectorObject : GraphObject
         catch (Exception e)
         {
             Log.AddException(e);
+        }
+    }
+
+    private void Update()
+    {
+        if (Hovered && Input.GetMouseButtonDown(1))
+        {
+            CreateNode();
         }
     }
 }

@@ -60,6 +60,17 @@ public class ForLoopNodeObject : CommandObject
         };
     }
     
+    protected override void MoveBranchNodes(Vector2 localPoint)
+    {
+        var next = ConnectorLoopObject.NextNodeObject;
+        while (next)
+        {
+            next.Move(localPoint);
+            if (!next.ConnectorObject) break;
+            next = next.ConnectorObject.NextNodeObject;
+        }
+    }
+    
     private void Update()
     {
         var connector = ConnectorLoopObject;
@@ -71,7 +82,10 @@ public class ForLoopNodeObject : CommandObject
 
         if(!connector || connector == ConnectorLoopObject) return;
         
-        var brt = connector.transform;
-        ConnectorObject.transform.position = new Vector3(transform.position.x, brt.transform.position.y - 50);
+        var bt = connector.transform;
+        var prevPosition = ConnectorObject.RectTransform.anchoredPosition;
+        ConnectorObject.transform.position = new Vector3(transform.position.x, bt.transform.position.y - 50);
+        var delta = ConnectorObject.RectTransform.anchoredPosition - prevPosition;
+        if(delta.y != 0) MoveAllFollowingNodes(new Vector2(0, delta.y));
     }
 }

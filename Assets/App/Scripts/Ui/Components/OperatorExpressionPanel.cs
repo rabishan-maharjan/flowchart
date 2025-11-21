@@ -38,14 +38,23 @@ public class OperatorExpressionPanel : MonoBehaviour
         });
     }
 
-    public void Set(List<Variable> allVariables, Variable variable, string operatorName)
+    public void Set(List<Variable> allVariables, Variable selected, string operatorName)
     {
-        dr_variable.Set(allVariables, variable);
-        var operators = new List<string>(OperatorHandler.ArithmeticOperators);
+        dr_variable.Set(allVariables, selected);
+        var operators = new List<string>(GetOperators(selected.Type));
         operators.Insert(0, "None");
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         if(!string.IsNullOrEmpty(operatorName)) dr_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.ArithmeticOperators, operatorName) + 1);
     }
+    
+    private string[] GetOperators(VariableType type) =>
+        type switch
+        {
+            VariableType.Number => OperatorHandler.ArithmeticOperators,
+            VariableType.String => OperatorHandler.StringOperators,
+            VariableType.Bool => OperatorHandler.BooleanOperators,
+            _ => throw new Exception($"Unsupported variable type: {type}")
+        };
 
     public void SetActive(bool value)
     {

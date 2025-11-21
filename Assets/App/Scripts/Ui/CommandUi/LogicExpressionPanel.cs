@@ -42,25 +42,51 @@ public class LogicExpressionPanel : Panel
                 Destroy(gameObject);
             }
         });
+        
+        dr_variable_1.onValueChanged.AddListener((value) =>
+        {
+            var v1 = Variable.TryGetVariable(dr_variable_1.options[dr_variable_1.value].text);
+            if (v1 == null)
+            {
+                MessageUi.Show("Variable is not a valid logic expression");
+                return;
+            }
+            
+            var operators = new List<string>(GetOperators(v1.Type));
+            dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
+        });
     }
 
     public void Set(List<Variable> allVariables, LogicExpression expression)
     {
         dr_variable_1.options = allVariables.Select(n => new TMP_Dropdown.OptionData(n.Name)).ToList();
         var v1 = Variable.TryGetVariable(expression.Variable1);
-        if(v1 != null) dr_variable_1.SetValueWithoutNotify(allVariables.IndexOf(v1));
+        
+        dr_variable_1.SetValueWithoutNotify(allVariables.IndexOf(v1));
         
         var v2 = Variable.TryGetVariable(expression.Variable2);
         dr_variable_2.Set(allVariables, v2);
         
-        var operators = new List<string>(OperatorHandler.LogicOperators);
+        var v = allVariables[0];
+        var operators = new List<string>(GetOperators(v.Type));
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         if(!string.IsNullOrEmpty(expression.Operator)) dr_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.LogicOperators, expression.Operator));
         
-        operators = new List<string>(OperatorHandler.ConjunctionOperators);
+        operators = new List<string>(OperatorHandler.BooleanOperators);
         operators.Insert(0, "None");
         dr_next_logic_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) dr_next_logic_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.ConjunctionOperators, expression.ConjunctionOperator));
+        if(!string.IsNullOrEmpty(expression.ConjunctionOperator)) dr_next_logic_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.BooleanOperators, expression.ConjunctionOperator));
+    }
+    
+    private string[] GetOperators(VariableType type)
+    {
+        return type switch
+        {
+            VariableType.Number => OperatorHandler.LogicOperators,
+            VariableType.String => OperatorHandler.StringLogicOperators,
+            VariableType.Bool => OperatorHandler.BooleanOperators,
+            _ => throw new Exception($"Unsupported variable type: {type}")
+        };
     }
     
     public void SetActive(bool value)

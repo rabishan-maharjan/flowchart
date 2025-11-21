@@ -156,6 +156,7 @@ MonoBehaviour:
   branchNode: 0
   nodeType: 1
   <ParentNodeObject>k__BackingField: {fileID: 0}
+  <NextNodeOffset>k__BackingField: {x: 0, y: -100}
 --- !u!114 &7490362350462395367
 MonoBehaviour:
   m_ObjectHideFlags: 0

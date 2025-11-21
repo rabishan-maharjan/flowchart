@@ -70,8 +70,32 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
             eventData.pressEventCamera,
             out var localPoint
         );
+        
+        var prevPosition = _rectTransform.anchoredPosition;
 
         _rectTransform.anchoredPosition = localPoint - _dragOffset;
+        Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
+        
+        var delta = _rectTransform.anchoredPosition - prevPosition;
+        
+        MoveBranchNodes(delta);
+    }
+
+    public void MoveAllFollowingNodes(Vector2 delta)
+    {
+        var next = ConnectorObject?.NextNodeObject;
+        while (next)
+        {
+            next.Move(delta);
+            next = next.ConnectorObject?.NextNodeObject;
+        }
+    }
+    
+    protected virtual void MoveBranchNodes(Vector2 delta) {}
+
+    public void Move(Vector2 delta)
+    {
+        _rectTransform.anchoredPosition += delta;
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
 

@@ -1,7 +1,7 @@
 ﻿using Arcube.UiManagement;
 using UnityEngine.EventSystems;
 
-public class GraphObject : PanelItem, IPointerClickHandler
+public class GraphObject : PanelItem, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     protected bool Editable = true;
     public virtual void OnPointerClick(PointerEventData eventData)
@@ -21,5 +21,16 @@ public class GraphObject : PanelItem, IPointerClickHandler
         if(!Editable) return;
         
         Destroy(gameObject);
+    }
+
+    protected bool Hovered;
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Hovered = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Hovered = false;
     }
 }

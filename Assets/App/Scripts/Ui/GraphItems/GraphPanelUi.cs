@@ -6,7 +6,6 @@ using Arcube.AssetManagement;
 using Arcube.UiManagement;
 using NaughtyAttributes;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class GraphPanelUi : Ui
@@ -79,58 +78,6 @@ public class GraphPanelUi : Ui
         if (Input.GetKey(KeyCode.Delete) || Input.GetKey(KeyCode.Backspace))
         {
             Selected?.Delete(false);
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            CreateNode();
-        }
-    }
-
-    private async void CreateNode()
-    {
-        try
-        {
-            var nodeSelectUi = UiManager.GetUi<NodeSelectUi>();
-            if (nodeSelectUi.State is UiState.Opened or UiState.Opening)
-            {
-                nodeSelectUi.Close();
-                return;
-            }
-        
-            // Get RectTransform of the container (the parent you instantiate into)
-            var containerRect = container.GetComponent<RectTransform>();
-            if (!containerRect) return;
-
-            // Choose the correct camera for ScreenPointToLocalPointInRectangle
-            var c = canvas; // assume this is your Canvas component
-            Camera cam = null;
-            if (c.renderMode != RenderMode.ScreenSpaceOverlay)
-                cam = c.worldCamera;
-
-            // Convert screen point directly to local point in *container* coordinates
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, Input.mousePosition, cam, out var localPoint))
-                return;
-
-            // Show node selection UI (await)
-            await nodeSelectUi.OpenAsync();
-            var newNodePrefab = nodeSelectUi.Selected;
-            if (!newNodePrefab) return;
-
-            // Instantiate under container
-            var nodeObject = Instantiate(newNodePrefab, container);
-            var nodeRect = nodeObject.GetComponent<RectTransform>();
-            if (!nodeRect) return;
-
-            // Ensure scale is correct (prefab import sometimes has wrong scale)
-            nodeRect.localScale = Vector3.one;
-
-            // Set anchoredPosition to the local point we calculated
-            nodeRect.anchoredPosition = localPoint;
-        }
-        catch (Exception e)
-        {
-            Log.AddException(e);
         }
     }
 

@@ -73,7 +73,11 @@ public class OperationCommandUi : CommandUi
         var variables = _exposedVariables.Where(v => v.Type == selected.Type && v.Type != VariableType.Bool).ToList();
         var operatorExpression = Instantiate(operatorExpressionPanelPrefab, list);
         
-        var v = new Variable();
+        var v = new Variable
+        {
+            Type = selected.Type
+        };
+        
         if (expression.Variable != null) _flowChartManager.VariableMap.TryGetValue(expression.Variable, out v);
         operatorExpression.Set(variables, v, expression.Operator);
         

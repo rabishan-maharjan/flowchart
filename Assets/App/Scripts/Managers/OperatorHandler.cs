@@ -19,7 +19,12 @@ public static class OperatorHandler
         "==", "!=", "<", "<=", ">", ">="
     };
     
-    public static readonly string[] ConjunctionOperators =
+    public static readonly string[] StringLogicOperators =
+    {
+        "==", "!="
+    };
+    
+    public static readonly string[] BooleanOperators =
     {
         "or", "and"
     };
@@ -48,6 +53,31 @@ public static class OperatorHandler
             }
 
             throw new Exception($"Operator '{operatorName}' is not valid for strings.");
+        }
+        
+        if (v1.Type == VariableType.Bool || v2.Type == VariableType.Bool)
+        {
+            if (operatorName == "or")
+            {
+                return new Variable
+                {
+                    Type = VariableType.Bool,
+                    Value = (v1.Value == "true" || v2.Value == "true").ToString(),
+                    Assigned = true
+                };
+            }
+            
+            if (operatorName == "and")
+            {
+                return new Variable
+                {
+                    Type = VariableType.Bool,
+                    Value = (v1.Value == "true" && v2.Value == "true").ToString(),
+                    Assigned = true
+                };
+            }
+
+            throw new Exception($"Operator '{operatorName}' is not valid for booleans.");
         }
 
         // ✅ Numeric arithmetic case

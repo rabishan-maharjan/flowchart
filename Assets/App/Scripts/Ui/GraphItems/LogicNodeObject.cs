@@ -81,7 +81,26 @@ public class LogicNodeObject : CommandObject
         _= pivot.Set((RectTransform)ConnectorObject.transform);
         yield return base.Start();
     }
-    
+
+    protected override void MoveBranchNodes(Vector2 delta)
+    {
+        var next = connectorTrue.NextNodeObject;
+        while (next)
+        {
+            next.Move(delta);
+            if (!next.ConnectorObject) break;
+            next = next.ConnectorObject.NextNodeObject;
+        }
+        
+        next = connectorFalse.NextNodeObject;
+        while (next)
+        {
+            next.Move(delta);
+            if (!next.ConnectorObject) break;
+            next = next.ConnectorObject.NextNodeObject;
+        }
+    }
+
     private void Update()
     {
         var connector1 = connectorTrue;
@@ -107,6 +126,9 @@ public class LogicNodeObject : CommandObject
         if(!selected || selected == connectorTrue || selected == connectorFalse) return;
         
         var brt = selected.transform;
+        var prevRectTransform = ConnectorObject.RectTransform.anchoredPosition;
         ConnectorObject.transform.position = new Vector3(transform.position.x, brt.transform.position.y - 50);
+        var delta = ConnectorObject.RectTransform.anchoredPosition - prevRectTransform;
+        if(delta.y != 0) MoveAllFollowingNodes(new Vector2(0, delta.y));
     }
 }

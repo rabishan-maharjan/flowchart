@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,17 +8,12 @@ public class DragAndZoom : MonoBehaviour
     [SerializeField] private float minZoom = 0.5f;   // Minimum scale
     [SerializeField] private float maxZoom = 3.0f;   // Maximum scale
 
-    private readonly Vector2 _dragLimitOffset = new(Screen.width * 0.75f, Screen.height * 0.75f);
     private Camera _mainCamera;
     private RectTransform _rectTransform;
     private Canvas _parentCanvas;
-    private Vector2 _initialPosition;
-    private Vector2 _minDragLimit;
-    private Vector2 _maxDragLimit;
 
-    private bool _isDragging = false;
+    private bool _isDragging;
     private Vector3 _dragOffset;
-
     private void Awake()
     {
         _mainCamera = Camera.main;
@@ -26,19 +22,37 @@ public class DragAndZoom : MonoBehaviour
 
         // Set the parent canvas to full screen
         SetCanvasToFullScreen();
-
-        // Store the initial position of the RectTransform
-        _initialPosition = _rectTransform.position;
-
-        // Calculate drag limits based on the initial position and offset
-        _minDragLimit = _initialPosition - _dragLimitOffset;
-        _maxDragLimit = _initialPosition + _dragLimitOffset;
     }
 
     private void Update()
     {
         HandleDrag();
         HandleZoom();
+        HandleShortcuts();
+    }
+
+    private void HandleShortcuts()
+    {
+        if (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)) return;
+        if (!Input.GetKeyDown(KeyCode.F)) return;
+        ResetPosition();
+    }
+
+    [Button]
+    private void ResetPosition()
+    {
+        var startNode = transform.GetComponentInChildren<StartNodeObject>();
+        var startNodeRectTransform = startNode.GetComponent<RectTransform>();
+        var pContainerRectTransform = _rectTransform;
+
+        // Calculate the offset to position StartNode at the top center
+        var newPosition = new Vector2(
+            -startNodeRectTransform.anchoredPosition.x,
+            -startNodeRectTransform.anchoredPosition.y + Screen.height / 2f - 100
+        );
+
+        // Apply the new position to p_container's RectTransform
+        pContainerRectTransform.anchoredPosition = newPosition;
     }
 
     private void HandleDrag()
@@ -60,11 +74,6 @@ public class DragAndZoom : MonoBehaviour
         if (!_isDragging) return;
 
         var newPosition = GetMouseWorldPosition() + _dragOffset;
-
-        // Apply drag limits relative to the initial position
-        newPosition.x = Mathf.Clamp(newPosition.x, _minDragLimit.x, _maxDragLimit.x);
-        newPosition.y = Mathf.Clamp(newPosition.y, _minDragLimit.y, _maxDragLimit.y);
-
         _rectTransform.position = newPosition;
     }
 
@@ -92,6 +101,6 @@ public class DragAndZoom : MonoBehaviour
     {
         var canvasRectTransform = _parentCanvas.GetComponent<RectTransform>();
         canvasRectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
-        canvasRectTransform.anchoredPosition = new Vector3(-Screen.width / 2f, 0);
+        canvasRectTransform.anchoredPosition = new Vector3(0, 0);
     }
 }
