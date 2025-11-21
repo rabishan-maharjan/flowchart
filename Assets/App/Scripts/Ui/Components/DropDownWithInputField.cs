@@ -80,7 +80,7 @@ public class DropDownWithInputField : MonoBehaviour
             {
                 if (variableNames.Contains(selected.Name))
                 {
-                    var selectedIndex = variableNames.IndexOf(selected.Name) + 1;
+                    var selectedIndex = variableNames.IndexOf(selected.Name);
                     _dropdown.SetValueWithoutNotify(selectedIndex);
                 }
 

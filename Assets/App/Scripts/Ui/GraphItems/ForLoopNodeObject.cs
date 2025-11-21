@@ -60,12 +60,13 @@ public class ForLoopNodeObject : CommandObject
         };
     }
     
-    protected override void MoveBranchNodes(Vector2 localPoint)
+    public override void MoveBranchNodes(Vector2 localPoint)
     {
         var next = ConnectorLoopObject.NextNodeObject;
         while (next)
         {
             next.Move(localPoint);
+            next.MoveBranchNodes(localPoint);
             if (!next.ConnectorObject) break;
             next = next.ConnectorObject.NextNodeObject;
         }

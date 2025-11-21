@@ -15,6 +15,9 @@ public class WhileLoopCommand : Command
 
     [JsonIgnore] private bool _result;
     public readonly List<LogicExpression> Expressions = new();
+    
+    public override bool IsVariableUsed(string variable) => Expressions.Exists(x => x.Variable1 == variable || x.Variable2 == variable);
+
     public override async Task Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();

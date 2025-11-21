@@ -6,11 +6,14 @@ using Newtonsoft.Json;
 
 public class OutputCommand : Command
 {
-    public List<string> Variables { get; set; } = new();
     public OutputCommand()
     {
         Name = "OutputCommand";
     }
+    
+    public List<string> Variables { get; set; } = new();
+    public override bool IsVariableUsed(string variable) => Variables.Contains(variable);
+
     [JsonIgnore] private string Output { get; set; }
     public override async Task Execute(CancellationTokenSource cts)
     {

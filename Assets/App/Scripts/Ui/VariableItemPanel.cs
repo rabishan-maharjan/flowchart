@@ -28,8 +28,8 @@ public class VariableItemPanel : PanelItem
         
         gameObject.FindObject<ButtonImage>("b_remove").OnClick.AddListener(() =>
         {
-            AppManager.GetManager<FlowChartManager>().RemoveVariable(_variable);
-            Destroy(gameObject);
+            var success = UiManager.GetUi<GraphPanelUi>().RemoveVariable(_variable);
+            if(success) Destroy(gameObject);
         });
     }
 

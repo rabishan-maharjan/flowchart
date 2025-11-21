@@ -51,6 +51,13 @@ public class ConsoleUi : Ui
                 MessageUi.Show("Input cannot be empty");
                 return;
             }
+
+            var input = ip_input.text.ToLower(); 
+            if (_activeVariable.Type == VariableType.Bool && (input != "true" && input != "false"))
+            {
+                MessageUi.Show("Input must be true or false");
+                return;
+            }
             
             AddText(value, true);
             _activeVariable.Value = value;

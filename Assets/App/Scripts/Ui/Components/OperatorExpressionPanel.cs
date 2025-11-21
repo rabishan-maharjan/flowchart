@@ -44,7 +44,7 @@ public class OperatorExpressionPanel : MonoBehaviour
         var operators = new List<string>(GetOperators(selected.Type));
         operators.Insert(0, "None");
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        if(!string.IsNullOrEmpty(operatorName)) dr_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.ArithmeticOperators, operatorName) + 1);
+        if(!string.IsNullOrEmpty(operatorName)) dr_operator.SetValueWithoutNotify( operators.IndexOf(operatorName) + 1);
     }
     
     private string[] GetOperators(VariableType type) =>

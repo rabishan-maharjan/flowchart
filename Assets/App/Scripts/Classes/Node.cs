@@ -11,6 +11,8 @@ public class Node
     {
         ID = Guid.NewGuid().ToString();
     }
+
+    public virtual bool IsVariableUsed(string variable) => false;
 }
 
 public class StartNode : Node

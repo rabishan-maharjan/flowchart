@@ -8,26 +8,27 @@ public static class OperatorHandler
     {
         "+", "-", "*", "/", "%"
     };
-    
+
     public static readonly string[] StringOperators =
     {
         "+"
-    };
-
-    public static readonly string[] LogicOperators =
-    {
-        "==", "!=", "<", "<=", ">", ">="
-    };
-    
-    public static readonly string[] StringLogicOperators =
-    {
-        "==", "!="
     };
     
     public static readonly string[] BooleanOperators =
     {
         "or", "and"
     };
+
+    public static readonly string[] LogicOperators =
+    {
+        "==", "!=", "<", "<=", ">", ">="
+    };
+
+    public static readonly string[] StringLogicOperators =
+    {
+        "==", "!="
+    };
+    
 
     public static bool Verify(string operatorName)
         => LogicOperators.Contains(operatorName) || ArithmeticOperators.Contains(operatorName);
@@ -38,7 +39,7 @@ public static class OperatorHandler
         {
             throw new Exception($"Variables must be of the same type to perform arithmetic operation");
         }
-        
+
         // ✅ String concatenation case
         if (v1.Type == VariableType.String || v2.Type == VariableType.String)
         {
@@ -54,7 +55,7 @@ public static class OperatorHandler
 
             throw new Exception($"Operator '{operatorName}' is not valid for strings.");
         }
-        
+
         if (v1.Type == VariableType.Bool || v2.Type == VariableType.Bool)
         {
             if (operatorName == "or")
@@ -66,7 +67,7 @@ public static class OperatorHandler
                     Assigned = true
                 };
             }
-            
+
             if (operatorName == "and")
             {
                 return new Variable

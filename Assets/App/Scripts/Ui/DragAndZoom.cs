@@ -41,18 +41,28 @@ public class DragAndZoom : MonoBehaviour
     [Button]
     private void ResetPosition()
     {
-        var startNode = transform.GetComponentInChildren<StartNodeObject>();
-        var startNodeRectTransform = startNode.GetComponent<RectTransform>();
-        var pContainerRectTransform = _rectTransform;
+        var startNode = GetComponentInChildren<StartNodeObject>();
+        var startNodeRect = startNode.GetComponent<RectTransform>();
+        var containerRect = _rectTransform;
 
-        // Calculate the offset to position StartNode at the top center
-        var newPosition = new Vector2(
-            -startNodeRectTransform.anchoredPosition.x,
-            -startNodeRectTransform.anchoredPosition.y + Screen.height / 2f - 100
-        );
+        var canvas = containerRect.GetComponentInParent<Canvas>();
+        var cam = canvas.worldCamera;
 
-        // Apply the new position to p_container's RectTransform
-        pContainerRectTransform.anchoredPosition = newPosition;
+        // Distance from camera to the canvas plane
+        float dist = Mathf.Abs(canvas.transform.position.z - cam.transform.position.z);
+
+        // 1. Convert screen center to world using the correct Z distance
+        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, dist);
+        Vector3 worldCenter = cam.ScreenToWorldPoint(screenCenter);
+
+        // 2. Find StartNode’s world position
+        Vector3 nodeWorldPos = startNodeRect.position;
+
+        // 3. Compute world offset
+        Vector3 offset = worldCenter - nodeWorldPos;
+
+        // 4. Apply offset to container
+        containerRect.position += offset;
     }
 
     private void HandleDrag()

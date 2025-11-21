@@ -70,7 +70,7 @@ public class OperationCommandUi : CommandUi
     private void AddField(Expression expression)
     {
         var selected = _exposedVariables[dr_variable.value];
-        var variables = _exposedVariables.Where(v => v.Type == selected.Type && v.Type != VariableType.Bool).ToList();
+        var variables = _exposedVariables.Where(v => v.Type == selected.Type).ToList();
         var operatorExpression = Instantiate(operatorExpressionPanelPrefab, list);
         
         var v = new Variable
@@ -145,7 +145,7 @@ public class OperationCommandUi : CommandUi
             operationCommand.Expressions.Add(new Expression()
             {
                 Variable = operatorExpression.dr_variable.Value.ID,
-                Operator = operatorExpression.dr_operator.value > 0 ? OperatorHandler.ArithmeticOperators[operatorExpression.dr_operator.value - 1] : ""
+                Operator = operatorExpression.dr_operator.value > 0 ? operatorExpression.dr_operator.options[operatorExpression.dr_operator.value].text : ""
             });
         }
         

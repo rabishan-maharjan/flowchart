@@ -13,6 +13,8 @@ public class ForLoopCommand : Command
     }
 
     public string Variable;
+    public override bool IsVariableUsed(string variable) => Variable == variable;
+
     public bool Reverse = false;
     public int Count = 0;
     public int Steps = 1;

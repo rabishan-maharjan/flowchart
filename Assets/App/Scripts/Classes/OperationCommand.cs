@@ -28,12 +28,14 @@ public class Expression
 public class OperationCommand : Command
 {
     public string Variable { get; set; }
-    public List<Expression> Expressions { get; set; } = new();
     public OperationCommand()
     {
         Name = "OperationCommand";
     }
     
+    public List<Expression> Expressions { get; set; } = new();
+    public override bool IsVariableUsed(string variable) => Variable == variable || Expressions.Exists(x => x.Variable == variable);
+
     public override async Task Execute(CancellationTokenSource cts)
     {
         try

@@ -79,6 +79,11 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         var delta = _rectTransform.anchoredPosition - prevPosition;
         
         MoveBranchNodes(delta);
+
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            MoveAllFollowingNodes(delta);
+        }
     }
 
     public void MoveAllFollowingNodes(Vector2 delta)
@@ -87,11 +92,12 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         while (next)
         {
             next.Move(delta);
+            next.MoveBranchNodes(delta);
             next = next.ConnectorObject?.NextNodeObject;
         }
     }
     
-    protected virtual void MoveBranchNodes(Vector2 delta) {}
+    public virtual void MoveBranchNodes(Vector2 delta) {}
 
     public void Move(Vector2 delta)
     {
@@ -162,6 +168,8 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
         
         _ = lineDrawer.Set(newBranchConnectorObject.transform.GetChild(0) as RectTransform, false);
     }
+    
+    public bool IsVariableUsed(string variable) => Node.IsVariableUsed(variable);
 
     public override void Delete(bool force)
     {

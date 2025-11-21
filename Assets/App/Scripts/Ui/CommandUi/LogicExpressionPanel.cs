@@ -59,6 +59,12 @@ public class LogicExpressionPanel : Panel
 
     public void Set(List<Variable> allVariables, LogicExpression expression)
     {
+        if(allVariables.Count == 0)
+        {
+            MessageUi.Show("No variables available");
+            return;
+        }
+        
         dr_variable_1.options = allVariables.Select(n => new TMP_Dropdown.OptionData(n.Name)).ToList();
         var v1 = Variable.TryGetVariable(expression.Variable1);
         
@@ -66,11 +72,11 @@ public class LogicExpressionPanel : Panel
         
         var v2 = Variable.TryGetVariable(expression.Variable2);
         dr_variable_2.Set(allVariables, v2);
-        
-        var v = allVariables[0];
+
+        var v = v1 ?? allVariables[0];
         var operators = new List<string>(GetOperators(v.Type));
         dr_operator.options = operators.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        if(!string.IsNullOrEmpty(expression.Operator)) dr_operator.SetValueWithoutNotify( Array.IndexOf(OperatorHandler.LogicOperators, expression.Operator));
+        if(!string.IsNullOrEmpty(expression.Operator)) dr_operator.SetValueWithoutNotify( operators.IndexOf(expression.Operator));
         
         operators = new List<string>(OperatorHandler.BooleanOperators);
         operators.Insert(0, "None");
@@ -84,7 +90,7 @@ public class LogicExpressionPanel : Panel
         {
             VariableType.Number => OperatorHandler.LogicOperators,
             VariableType.String => OperatorHandler.StringLogicOperators,
-            VariableType.Bool => OperatorHandler.BooleanOperators,
+            VariableType.Bool => OperatorHandler.StringLogicOperators,
             _ => throw new Exception($"Unsupported variable type: {type}")
         };
     }

@@ -82,12 +82,13 @@ public class LogicNodeObject : CommandObject
         yield return base.Start();
     }
 
-    protected override void MoveBranchNodes(Vector2 delta)
+    public override void MoveBranchNodes(Vector2 delta)
     {
         var next = connectorTrue.NextNodeObject;
         while (next)
         {
             next.Move(delta);
+            next.MoveBranchNodes(delta);
             if (!next.ConnectorObject) break;
             next = next.ConnectorObject.NextNodeObject;
         }

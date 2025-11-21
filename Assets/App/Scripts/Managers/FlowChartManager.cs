@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
+using Arcube.UiManagement;
 
 public enum CompileState
 {
@@ -135,6 +136,16 @@ public class FlowChartManager : ManagerBase
     
     public void RemoveVariable(Variable variable)
     {
+        foreach (var function in Functions)
+        {
+            foreach (var node in function.Value.Nodes)
+            {
+                if (!node.IsVariableUsed(variable.ID)) continue;
+                MessageUi.Show("Variable is being used. Cannot delete!");
+                return;
+            }
+        }
+        
         var variables = Functions[_activeFunction].Variables;
         variables.Remove(variable);
     }

@@ -72,6 +72,22 @@ public class GraphPanelUi : Ui
         }
     }
 
+    public bool RemoveVariable(Variable variable)
+    {
+        foreach (var nodeObject in GetComponentsInChildren<NodeObject>())
+        {
+            if (nodeObject.IsVariableUsed(variable.ID))
+            {
+                //maybe quick highlight
+                MessageUi.Show($"Variable {variable.Name} is used in {nodeObject.Node.Name}");
+                return false;
+            }
+        }
+        
+        AppManager.GetManager<FlowChartManager>().RemoveVariable(variable);
+        return true;
+    }
+
     public static GraphObject Selected { get; set; }
     private void Update()
     {
