@@ -22,11 +22,21 @@ public class ForLoopCommandUi : CommandUi
         base.Reset();
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        dr_variable.onValueChanged.AddListener((value) =>
+        {
+            ip_count.Interactable = value != 0;
+            if(value > 0) ip_count.Text = _exposedVariables[value - 1].Value;
+        });
+    }
+
     private List<Variable> _exposedVariables;
     public override Task Open(Command command)
     {
         var loopCommand = (ForLoopCommand)command;
-        ip_count.Text = loopCommand.Count.ToString();
+        ip_count.Text = loopCommand.Start.ToString();
         tb_reverse.IsOn = loopCommand.Reverse;
         ip_step.Text = loopCommand.Steps.ToString();
 
@@ -45,7 +55,7 @@ public class ForLoopCommandUi : CommandUi
     {
         var loopCommand = (ForLoopCommand)Command;
         
-        int.TryParse(ip_count.Text, out loopCommand.Count);
+        int.TryParse(ip_count.Text, out loopCommand.Start);
         int.TryParse(ip_step.Text, out loopCommand.Steps);
         loopCommand.Reverse = tb_reverse.IsOn;
         if (dr_variable.value > 0)

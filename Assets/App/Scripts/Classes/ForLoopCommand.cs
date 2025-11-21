@@ -16,7 +16,7 @@ public class ForLoopCommand : Command
     public override bool IsVariableUsed(string variable) => Variable == variable;
 
     public bool Reverse = false;
-    public int Count = 0;
+    public int Start = 0;
     public int Steps = 1;
     public override async Task Execute(CancellationTokenSource cts)
     {
@@ -24,25 +24,26 @@ public class ForLoopCommand : Command
         //get all commands after this command
         //execute them
         Variable v = null;
-        if(!string.IsNullOrEmpty(Variable)) v = AppManager.GetManager<FlowChartManager>().VariableMap[Variable]; 
+        if(!string.IsNullOrEmpty(Variable)) v = AppManager.GetManager<FlowChartManager>().VariableMap[Variable];
+        var delta = Start / Steps;
         if (Reverse)
         {
-            for (var i = Count; i > 0; i -= Steps)
+            for (var i = Steps; i > 0; i--)
             {
                 if (v != null)
                 {
-                    v.Value = i.ToString();
+                    v.Value = (i * delta).ToString();
                 }
                 await ExecuteLoopItems(cts);
             }
         }
         else
         {
-            for (var i = 1; i <= Count; i += Steps)
+            for (var i = 1; i <= Steps; i++)
             {
                 if (v != null)
                 {
-                    v.Value = i.ToString();
+                    v.Value = (i * delta).ToString();
                 }
                 await ExecuteLoopItems(cts);
             }    
@@ -84,7 +85,7 @@ public class ForLoopCommand : Command
         var v = global::Variable.TryGetVariable(Variable);
         if(v != null) output += $" {v.Name}\n";
         else output += "\n";
-        output += $" Count {Count}\n";
+        output += $" Start {Start}\n";
         output += $" Steps {Steps}\n";
         output += Reverse ? "Desc\n" : "Asc\n";
         return output;
@@ -96,9 +97,8 @@ public class ForLoopCommand : Command
         var v = global::Variable.TryGetVariable(Variable);
         if(v != null) output += $" {v.Name}:{v.Value}\n";
         else output += "\n";
-        output += $" Count {Count}\n";
+        output += $" From {Start} to 0\n";
         output += $" Steps {Steps}\n";
-        output += Reverse ? "Desc\n" : "Asc\n";
         return output;
     }
 }
