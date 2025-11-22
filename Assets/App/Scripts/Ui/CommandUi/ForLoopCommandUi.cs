@@ -1,71 +1,97 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
-using TMPro;
 using UnityEngine;
 
 public class ForLoopCommandUi : CommandUi
 {
-    [SerializeField] private TMP_Dropdown dr_variable;
-    [SerializeField] private InputFieldSimple ip_count;
-    [SerializeField] private ToggleButton tb_reverse;
-    [SerializeField] private InputFieldSimple ip_step;
+    [SerializeField] private InputFieldSimple ip_name;
+    [SerializeField] private DropDownWithInputField dr_ip_start;
+    [SerializeField] private DropDownWithInputField dr_ip_end;
+    [SerializeField] private DropDownWithInputField dr_ip_step;
     protected override void Reset()
     {
-        transform.TryFindObject(nameof(dr_variable), out dr_variable);
-        transform.TryFindObject(nameof(ip_count), out ip_count);
-        transform.TryFindObject(nameof(tb_reverse), out tb_reverse);
-        transform.TryFindObject(nameof(ip_step), out ip_step);
+        transform.TryFindObject(nameof(ip_name), out ip_name);
+        transform.TryFindObject(nameof(dr_ip_start), out dr_ip_start);
+        transform.TryFindObject(nameof(dr_ip_end), out dr_ip_end);
+        transform.TryFindObject(nameof(dr_ip_step), out dr_ip_step);
         
         base.Reset();
     }
-
-    protected override void Start()
-    {
-        base.Start();
-        dr_variable.onValueChanged.AddListener((value) =>
-        {
-            ip_count.Interactable = value != 0;
-            if(value > 0) ip_count.Text = _exposedVariables[value - 1].Value;
-        });
-    }
-
+    
     private List<Variable> _exposedVariables;
-    public override Task Open(Command command)
+    protected override void SetUi()
     {
-        var loopCommand = (ForLoopCommand)command;
-        ip_count.Text = loopCommand.Start.ToString();
-        tb_reverse.IsOn = loopCommand.Reverse;
-        ip_step.Text = loopCommand.Steps.ToString();
+        try
+        {
+            var loopCommand = (ForLoopCommand)Command;
+            var nameVar = Variable.TryGetVariable(loopCommand.Variable);
+            ip_name.Text = nameVar != null ? nameVar.Name : "i";
 
-        var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-        _exposedVariables = variables.Where(v => v.Exposed && v.Type == VariableType.Number).ToList();
-        var names = _exposedVariables.Select(v => v.Name).ToList();
-        names.Insert(0, "Auto");
-        dr_variable.options = names.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
-        var selected = Variable.TryGetVariable(loopCommand.Variable);
-        dr_variable.value = selected != null ? _exposedVariables.IndexOf(selected) + 1 : 0;
+            var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
+            _exposedVariables = variables.Where(v => v.Exposed && v.Type == VariableType.Number).ToList();
+            var v = Variable.TryGetVariable(loopCommand.Start) ?? new Variable();
+            dr_ip_start.Set(_exposedVariables, v);
         
-        return base.Open(command);
+            v = Variable.TryGetVariable(loopCommand.End) ?? new Variable();
+            dr_ip_end.Set(_exposedVariables, v);
+        
+            v = Variable.TryGetVariable(loopCommand.Steps) ?? new Variable {Value = "1"};
+            dr_ip_step.Set(_exposedVariables, v);
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     protected override void Apply()
     {
-        var loopCommand = (ForLoopCommand)Command;
-        
-        int.TryParse(ip_count.Text, out loopCommand.Start);
-        int.TryParse(ip_step.Text, out loopCommand.Steps);
-        loopCommand.Reverse = tb_reverse.IsOn;
-        if (dr_variable.value > 0)
+        try
         {
-            var v = _exposedVariables[dr_variable.value - 1];
-            loopCommand.Variable = v.ID;
+            if (string.IsNullOrEmpty(ip_name.Text) || string.IsNullOrEmpty(dr_ip_start.Text) || string.IsNullOrEmpty(dr_ip_end.Text) || string.IsNullOrEmpty(dr_ip_step.Text))
+            {
+                MessageUi.Show("Incomplete parameters");
+                return;
+            }
+        
+            var loopCommand = (ForLoopCommand)Command;
+
+            var start = dr_ip_start.Value;
+            start.Type = VariableType.Number;
+            var end = dr_ip_end.Value;
+            end.Type = VariableType.Number;
+            var steps = dr_ip_step.Value;
+            steps.Type = VariableType.Number;
+            
+            loopCommand.Start = start.ID; 
+            loopCommand.End = end.ID;
+            loopCommand.Steps = steps.ID;
+
+            if (string.IsNullOrEmpty(loopCommand.Variable))
+            {
+                var i = new Variable
+                {
+                    Name = ip_name.Text,
+                    Type = VariableType.String,
+                    Scope = VariableScope.Local
+                };
+                loopCommand.Variable = i.ID;
+                AppManager.GetManager<FlowChartManager>().AddVariable(i);
+            }
+            else
+            {
+                var v = Variable.TryGetVariable(loopCommand.Variable);
+                v.Name = ip_name.Text;
+            }
+
+            base.Apply();
         }
-        else  loopCommand.Variable = "";
-        
-        
-        base.Apply();
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 }

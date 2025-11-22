@@ -1,6 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Arcube;
+using Newtonsoft.Json;
+
+public enum VariableScope
+{
+    Global,
+    Functional,
+    Local,
+    Inline
+}
 
 public class Variable
 {
@@ -9,8 +18,8 @@ public class Variable
     public VariableType Type;
     public string Value;
     public bool Assigned;
-    public bool Exposed = false;
-    
+    public VariableScope Scope = VariableScope.Inline;
+    [JsonIgnore] public bool Exposed => Scope is VariableScope.Global or VariableScope.Functional;
     public Variable() { }
     
     public Variable(Variable v)
@@ -20,7 +29,7 @@ public class Variable
         Type = v.Type;
         Value = v.Value;
         Assigned = v.Assigned;
-        Exposed = v.Exposed;
+        Scope = v.Scope;
     }
 
     public static Variable TryGetVariable(string id)

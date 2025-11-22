@@ -12,18 +12,17 @@ public class DynamicInputFieldWidth : MonoBehaviour
     [SerializeField] private int maxWidth = 500; // Maximum width of the input field
     
     [SerializeField] private RectTransform[] relatives; // Array of RectTransforms to adjust their width
-    private RectTransform inputFieldRect; // Reference to the RectTransform of the input field
-    
+    private RectTransform _inputFieldRect; // Reference to the RectTransform of the input field
     private void Start()
     {
-        if (inputField == null)
+        if (!inputField)
         {
             inputField = GetComponent<TMP_InputField>();
         }
 
-        inputFieldRect = inputField.GetComponent<RectTransform>();
+        _inputFieldRect = inputField.GetComponent<RectTransform>();
 
-        if (inputField != null)
+        if (inputField)
         {
             inputField.onValueChanged.AddListener(AdjustInputFieldWidth);
             AdjustInputFieldWidth(inputField.text); // Initial adjustment
@@ -36,7 +35,7 @@ public class DynamicInputFieldWidth : MonoBehaviour
 
     private void AdjustInputFieldWidth(string text)
     {
-        if (inputFieldRect == null)
+        if (!_inputFieldRect)
         {
             Debug.LogWarning("RectTransform reference is missing.");
             return;
@@ -55,12 +54,12 @@ public class DynamicInputFieldWidth : MonoBehaviour
         var newWidth = Mathf.Clamp(preferredWidth + rightOffset, minWidth, maxWidth);
 
         // Adjust the width of the input field
-        inputFieldRect.sizeDelta = new Vector2(newWidth, inputFieldRect.sizeDelta.y);
+        _inputFieldRect.sizeDelta = new Vector2(newWidth, _inputFieldRect.sizeDelta.y);
 
         // Adjust the width of the relatives
         foreach (var relative in relatives)
         {
-            if (relative != null)
+            if (relative)
             {
                 relative.sizeDelta = new Vector2(newWidth, relative.sizeDelta.y);
             }

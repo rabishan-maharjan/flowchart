@@ -121,7 +121,7 @@ public class VariableUi : Ui
         else _variable.Value = tb_value.IsOn ? "true" : "false";
         
         _variable.Assigned = true;
-        _variable.Exposed = true;
+        _variable.Scope = VariableScope.Functional;
         
         flowchartManager.AddVariable(_variable);
         

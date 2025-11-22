@@ -38,8 +38,7 @@ namespace Arcube
         {
             try
             {
-                Log.Add(() => "Registering");
-                
+                Log.Add(() => "Registering");                
                 await AppManager.Register();
                 await UIManager.Register();
 

@@ -38,6 +38,8 @@ public class DropDownWithInputField : MonoBehaviour
             return v;
         }
     }
+    
+    public string Text => ip_field.text;
 
     public UnityEvent<string> onValueChanged;
     private void Start()

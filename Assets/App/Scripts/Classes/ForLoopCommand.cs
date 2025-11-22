@@ -15,35 +15,41 @@ public class ForLoopCommand : Command
     public string Variable;
     public override bool IsVariableUsed(string variable) => Variable == variable;
 
-    public bool Reverse = false;
-    public int Start = 0;
-    public int Steps = 1;
+    public string Start;
+    public string End;
+    public string Steps;
     public override async Task Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
         //get all commands after this command
         //execute them
+        var flowChartManager = AppManager.GetManager<FlowChartManager>(); 
         Variable v = null;
-        if(!string.IsNullOrEmpty(Variable)) v = AppManager.GetManager<FlowChartManager>().VariableMap[Variable];
-        var delta = Start / Steps;
-        if (Reverse)
+        if(!string.IsNullOrEmpty(Variable)) v = flowChartManager.VariableMap[Variable];
+        
+        var start = Convert.ToInt32(flowChartManager.VariableMap[Start].GetValue());
+        var end = Convert.ToInt32(flowChartManager.VariableMap[End].GetValue());
+        var steps = Convert.ToInt32(flowChartManager.VariableMap[Steps].GetValue());
+        
+        var reverse = start > end;
+        if (reverse)
         {
-            for (var i = Steps; i > 0; i--)
+            for (var i = start; i >= end; i--)
             {
                 if (v != null)
                 {
-                    v.Value = (i * delta).ToString();
+                    v.Value = (i * steps).ToString();
                 }
                 await ExecuteLoopItems(cts);
             }
         }
         else
         {
-            for (var i = 1; i <= Steps; i++)
+            for (var i = start; i <= end; i++)
             {
                 if (v != null)
                 {
-                    v.Value = (i * delta).ToString();
+                    v.Value = (i * steps).ToString();
                 }
                 await ExecuteLoopItems(cts);
             }    
@@ -85,9 +91,12 @@ public class ForLoopCommand : Command
         var v = global::Variable.TryGetVariable(Variable);
         if(v != null) output += $" {v.Name}\n";
         else output += "\n";
-        output += $" Start {Start}\n";
-        output += $" Steps {Steps}\n";
-        output += Reverse ? "Desc\n" : "Asc\n";
+        var start = global::Variable.TryGetVariable(Start).Value;
+        output += $" Start {start}\n";
+        var end = global::Variable.TryGetVariable(End).Value;
+        output += $" End {end}\n";
+        var steps = global::Variable.TryGetVariable(Steps).Value;
+        output += $" Steps {steps}\n";
         return output;
     }
     
@@ -97,8 +106,12 @@ public class ForLoopCommand : Command
         var v = global::Variable.TryGetVariable(Variable);
         if(v != null) output += $" {v.Name}:{v.Value}\n";
         else output += "\n";
-        output += $" From {Start} to 0\n";
-        output += $" Steps {Steps}\n";
+        var start = global::Variable.TryGetVariable(Start).Value;
+        output += $" Start {start}\n";
+        var end = global::Variable.TryGetVariable(End).Value;
+        output += $" End {end}\n";
+        var steps = global::Variable.TryGetVariable(Steps).Value;
+        output += $" Steps {steps}\n";
         return output;
     }
 }
