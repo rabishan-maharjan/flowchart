@@ -10,6 +10,7 @@ using UnityEngine.UI;
 
 public class GraphPanelUi : Ui
 {
+    public static bool IsDirty { get; set; }
     private FlowChartManager _flowChartManager;
     [SerializeField] private Transform container;
     public override Task Register()
@@ -52,10 +53,11 @@ public class GraphPanelUi : Ui
     private async Task New()
     {
         Clear();
+        _flowChartManager.ClearNodes();
 
         var startNode = await AssetManager.Instantiate<NodeObject>("StartNode", container);
         startNode.transform.localPosition = Vector3.zero;
-
+        
         var endNode = await AssetManager.Instantiate<NodeObject>("EndNode", container);
         var rt = (RectTransform)endNode.transform;
         rt.anchoredPosition = new Vector2(0, -100);

@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 242ebaa6cb145f44991598eabbef8734
+    m_Address: BreakCommand
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7669fc04d76771441a64c5a88d5c1f04
     m_Address: LogicCommand
     m_ReadOnly: 0

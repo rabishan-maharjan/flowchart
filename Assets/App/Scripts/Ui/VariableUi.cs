@@ -99,14 +99,15 @@ public class VariableUi : Ui
             return;
         }
 
+        _variable.Name = ip_name.Text;
+        
         var flowchartManager = AppManager.GetManager<FlowChartManager>();
         if (flowchartManager.ActiveVariables.FirstOrDefault(v => v.Name == ip_name.Text && v.ID != _variable.ID) != null)
         {
-            MessageUi.Show("Name is already used");
+            MessageUi.Show($"Name {_variable.Name} is already used");
             return;
         }
         
-        _variable.Name = ip_name.Text;
         _variable.Type = (VariableType)dr_type.value;
         if (_variable.Type == VariableType.Dynamic)
         {

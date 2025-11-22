@@ -12,12 +12,12 @@ public enum NodeType
 
 public class ConnectorObject : GraphObject
 {
-    [SerializeField] private bool branchNode = false;
+    [SerializeField] public bool branchNode = false;
     [SerializeField] private NodeType nodeType = NodeType.Flow;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
     public NodeObject NextNodeObject { get; private set; }
-    
-    [field: SerializeField] public Vector2 NextNodeOffset { get; set; }
+
+    [field: SerializeField] public Vector3 NextNodeOffset { get; set; } = new Vector3(0, -100, 0);
 
     protected override void Reset()
     {
@@ -62,12 +62,12 @@ public class ConnectorObject : GraphObject
             nodeRect.localScale = Vector3.one;
 
             // Set anchoredPosition to the local point we calculated
-            nodeRect.anchoredPosition = ((RectTransform)ParentNodeObject.transform).anchoredPosition + NextNodeOffset;
+            nodeObject.transform.position = transform.position + NextNodeOffset;
 
             if (!branchNode && NextNodeObject)
             {
                 nodeObject.ConnectorObject.Connect(NextNodeObject);
-                nodeObject.MoveAllFollowingNodes(new Vector2(0, NextNodeOffset.y));
+                nodeObject.MoveAllFollowingNodes(NextNodeOffset);
             }
             
             Connect(nodeObject);
@@ -113,6 +113,7 @@ public class ConnectorObject : GraphObject
             //Debug.Log($"Adding line between {name} and {nodeObject.name} {Time.time}", gameObject);
             _ = lineDrawer.Set((RectTransform)nodeObject.transform);
 
+            nodeObject.Connect(this);
             CreateBranchLoop(branchConnector);
         }
         catch (Exception e)

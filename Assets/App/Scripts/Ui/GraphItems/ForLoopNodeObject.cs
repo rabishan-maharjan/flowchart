@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
-public class ForLoopNodeObject : CommandObject
+public class ForLoopNodeObject : BranchObject
 {
     [field: SerializeField] public ConnectorObject ConnectorLoopObject { get; set; }
     public override Node Node => _node ??= new ForLoopCommand();

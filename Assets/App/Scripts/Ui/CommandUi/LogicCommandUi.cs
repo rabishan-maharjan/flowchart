@@ -26,7 +26,7 @@ public class LogicCommandUi : CommandUi
             
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;
-            _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+            _exposedVariables = _allVariables.Where(v => v.Exposed || v.BranchID == Command.BranchID).ToList();
             
             //load old variables
             var logicCommand = (LogicCommand)Command;
@@ -99,7 +99,7 @@ public class LogicCommandUi : CommandUi
             var logicExpressionPanel = list.GetChild(i).GetComponent<LogicExpressionPanel>();
             if (!logicExpressionPanel) continue;
             
-            var v1 = Variable.TryGetVariable(_exposedVariables[logicExpressionPanel.dr_variable_1.value].ID);
+            var v1 = _exposedVariables[logicExpressionPanel.dr_variable_1.value];
             var v2 = logicExpressionPanel.dr_variable_2.Value;
 
             if (v1 == null || v2 == null)

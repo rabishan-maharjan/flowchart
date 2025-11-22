@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Arcube;
 using Newtonsoft.Json;
 
-public class ForLoopCommand : Command
+public class ForLoopCommand : BranchCommand
 {
     public string NodeLoop;
     public ForLoopCommand()
@@ -18,7 +18,7 @@ public class ForLoopCommand : Command
     public string Start;
     public string End;
     public string Steps;
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
         //get all commands after this command
@@ -40,7 +40,7 @@ public class ForLoopCommand : Command
                 {
                     v.Value = (i * steps).ToString();
                 }
-                await ExecuteLoopItems(cts);
+                if(!await ExecuteLoopItems(cts)) break;
             }
         }
         else
@@ -51,29 +51,38 @@ public class ForLoopCommand : Command
                 {
                     v.Value = (i * steps).ToString();
                 }
-                await ExecuteLoopItems(cts);
+
+                var shouldContinue = await ExecuteLoopItems(cts); 
+                if(!shouldContinue) break;
             }    
         }
      
         Completed = true;
         OnExecuteEnd?.Invoke();
+        return true;
     }
 
     [JsonIgnore] public Action OnLoopStep;
-    private async Task ExecuteLoopItems(CancellationTokenSource cts)
+    private async Task<bool> ExecuteLoopItems(CancellationTokenSource cts)
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
         var node = flowChartManager.GetNode(NodeLoop);
         while (node != null)
         {
+            if (node is BreakCommand)
+            {
+                return false;
+            }
+
             if (node is Command command)
             {
                 //Debug.Log($"Executing {command.Name} from loop");
-                await command.Execute(cts);
+                var shouldContinue = await command.Execute(cts);
                 await Task.Yield();
                 OnLoopStep?.Invoke();
+                if(!shouldContinue) return false;
             }
-
+            
             if (!string.IsNullOrEmpty(node.NextNode))
             {
                 node = flowChartManager.GetNode(node.NextNode);
@@ -83,6 +92,8 @@ public class ForLoopCommand : Command
                 break;
             }
         }
+
+        return true;
     }
 
     public override string GetDescription()

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
-public class WhileLoopNodeObject : CommandObject
+public class WhileLoopNodeObject : BranchObject
 {
     [field: SerializeField] public ConnectorObject ConnectorLoopObject { get; set; }
     public override Node Node => _node ??= new WhileLoopCommand();

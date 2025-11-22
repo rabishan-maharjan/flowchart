@@ -36,7 +36,7 @@ public class OperationCommand : Command
     public List<Expression> Expressions { get; set; } = new();
     public override bool IsVariableUsed(string variable) => Variable == variable || Expressions.Exists(x => x.Variable == variable);
 
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         try
         {
@@ -69,6 +69,8 @@ public class OperationCommand : Command
         {
             Log.AddException(e);
         }
+        
+        return true;
     }
 
     public override string GetDescription()

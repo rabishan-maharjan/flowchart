@@ -12,7 +12,7 @@ public class InputCommand : Command
     public string Variable { get; set; }
     public override bool IsVariableUsed(string variable) => Variable == variable;
 
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
         if (string.IsNullOrEmpty(Variable))
@@ -26,6 +26,7 @@ public class InputCommand : Command
             cts.Token.ThrowIfCancellationRequested();
         }
         OnExecuteEnd?.Invoke();
+        return true;
     }
 
     public override string GetDescription()

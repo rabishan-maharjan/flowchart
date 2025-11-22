@@ -28,12 +28,12 @@ public enum ExecutionType
 
 public class FlowChartManager : ManagerBase
 {
-    private string _activeFunction = "Main";
-
+    private const string ActiveFunction = "Main";
     public Dictionary<string, Variable> VariableMap { get; set; } = new();
     public Dictionary<string, Function> Functions { get; private set; } = new();
-    public List<Variable> ActiveVariables => Functions[_activeFunction].Variables;
-    public List<Node> ActiveNodes => Functions[_activeFunction].Nodes;
+    public List<Variable> ActiveVariables => Functions[ActiveFunction].Variables;
+    public List<Node> ActiveNodes => Functions[ActiveFunction].Nodes;
+    public List<string> Branches { get; set; } = new();
     public ExecutionType ExecutionType { get; set; } = ExecutionType.Normal;
     public event Action<ProjectState, string> OnProjectStateChanged;
     public event Action<CompileState> OnCompileStateChanged;
@@ -55,7 +55,9 @@ public class FlowChartManager : ManagerBase
     public void New()
     {
         Functions.Clear();
-        Functions.Add("Main", new Function());
+        Functions.Add(ActiveFunction, new Function());
+        Branches.Clear();
+        VariableMap.Clear();
         CurrentFile = "";
         OnProjectStateChanged?.Invoke(ProjectState.New, CurrentFile);
     }
@@ -85,6 +87,12 @@ public class FlowChartManager : ManagerBase
             }
         }
         
+        Branches.Clear();
+        foreach (var variable in ActiveVariables)
+        {
+            if(!Branches.Contains(variable.BranchID)) Branches.Add(variable.BranchID);
+        }
+        
         OnProjectStateChanged?.Invoke(ProjectState.Load, CurrentFile);
     }
     
@@ -108,25 +116,10 @@ public class FlowChartManager : ManagerBase
             Log.AddException(e);
         }
     }
-    
-    public void SetActiveFunction(string function)
-    {
-        _activeFunction = function;
-    }
-    
-    public void AddFunction(string function)
-    {
-        Functions.Add(function, new Function());
-    }
-    
-    public void RemoveFunction(string function)
-    {
-        Functions.Remove(function);
-    }
 
     public void AddVariable(Variable variable)
     {
-        var variables = Functions[_activeFunction].Variables;
+        var variables = Functions[ActiveFunction].Variables;
         VariableMap.TryAdd(variable.ID, variable);
         if(!variables.Contains(variable))
         {
@@ -146,16 +139,16 @@ public class FlowChartManager : ManagerBase
             }
         }
         
-        var variables = Functions[_activeFunction].Variables;
+        var variables = Functions[ActiveFunction].Variables;
         variables.Remove(variable);
     }
     
     public void AddNode(Node node)
     {
-        Functions[_activeFunction].Nodes.Add(node);
+        Functions[ActiveFunction].Nodes.Add(node);
     }
 
-    public Node GetNode(string nextMainNode) => Functions[_activeFunction].Nodes.Find(x => x.ID == nextMainNode);
+    public Node GetNode(string nextMainNode) => Functions[ActiveFunction].Nodes.Find(x => x.ID == nextMainNode);
 
     public void StopExecution()
     {

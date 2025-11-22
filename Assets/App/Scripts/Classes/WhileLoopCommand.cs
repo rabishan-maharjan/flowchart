@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Arcube;
 using Newtonsoft.Json;
 
-public class WhileLoopCommand : Command
+public class WhileLoopCommand : BranchCommand
 {
     public string NodeLoop;
     public WhileLoopCommand()
@@ -18,7 +18,7 @@ public class WhileLoopCommand : Command
     
     public override bool IsVariableUsed(string variable) => Expressions.Exists(x => x.Variable1 == variable || x.Variable2 == variable);
 
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
         //get all commands after this command
@@ -26,12 +26,13 @@ public class WhileLoopCommand : Command
         _result = CalculateExpressions();
         while(_result)
         {
-            await ExecuteLoopItems(cts);
+            if(!await ExecuteLoopItems(cts)) break;
             _result = CalculateExpressions();
         };
 
         Completed = true;
         OnExecuteEnd?.Invoke();
+        return true;
     }
 
     private bool CalculateExpressions()
@@ -58,12 +59,14 @@ public class WhileLoopCommand : Command
     }
 
     [JsonIgnore] public Action OnLoopStep;
-    private async Task ExecuteLoopItems(CancellationTokenSource cts)
+    private async Task<bool> ExecuteLoopItems(CancellationTokenSource cts)
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
         var node = flowChartManager.GetNode(NodeLoop);
         while (node != null)
         {
+            if (node is BreakCommand) return false;
+
             if (node is Command command)
             {
                 //Debug.Log($"Executing {command.Name} from loop");
@@ -81,6 +84,8 @@ public class WhileLoopCommand : Command
                 break;
             }
         }
+
+        return true;
     }
 
     public override string GetDescription()

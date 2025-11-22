@@ -15,7 +15,7 @@ public class OutputCommand : Command
     public override bool IsVariableUsed(string variable) => Variables.Contains(variable);
 
     [JsonIgnore] private string Output { get; set; }
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
         Output = "";
@@ -39,6 +39,7 @@ public class OutputCommand : Command
         await Wait(cts);
         Completed = true;
         OnExecuteEnd?.Invoke();
+        return true;
     }
 
     public override string GetDescription()

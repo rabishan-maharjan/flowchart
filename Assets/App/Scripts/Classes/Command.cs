@@ -10,7 +10,7 @@ public abstract class Command : Node
     [JsonIgnore] public Action OnExecuteStart;
     [JsonIgnore] public Action OnExecuteEnd;
     public bool Completed { get; set; } = false;
-    public abstract Task Execute(CancellationTokenSource cts);
+    public abstract Task<bool> Execute(CancellationTokenSource cts);
 
     [JsonIgnore] protected string Description;
     public abstract string GetDescription();

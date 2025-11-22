@@ -21,7 +21,7 @@ public class LogicExpression
     }
 }
 
-public class LogicCommand : Command
+public class LogicCommand : BranchCommand
 {
     public string NodeTrue;
     public string NodeFalse;
@@ -35,7 +35,7 @@ public class LogicCommand : Command
     public override bool IsVariableUsed(string variable) => Expressions.Exists(x => x.Variable1 == variable || x.Variable2 == variable);
     
     [JsonIgnore] private bool _result;
-    public override async Task Execute(CancellationTokenSource cts)
+    public override async Task<bool> Execute(CancellationTokenSource cts)
     {
         OnExecuteStart?.Invoke();
 
@@ -66,7 +66,11 @@ public class LogicCommand : Command
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeTrue);
             if (node is Command command)
             {
-                await ExecuteBranchItems(command, cts);
+                if (!await ExecuteBranchItems(command, cts))
+                {
+                    Completed = true;
+                    return false;
+                }
             }
         }
         else
@@ -74,19 +78,26 @@ public class LogicCommand : Command
             var node = AppManager.GetManager<FlowChartManager>().GetNode(NodeFalse);
             if (node is Command command)
             {
-                await ExecuteBranchItems(command, cts);
+                if (!await ExecuteBranchItems(command, cts))
+                {
+                    Completed = true;
+                    return false;
+                }
             }
         }
 
         await Wait(cts);
         Completed = true;
+        return true;
     }
     
-    private async Task ExecuteBranchItems(Node node, CancellationTokenSource cts)
+    private async Task<bool> ExecuteBranchItems(Node node, CancellationTokenSource cts)
     {
         var flowChartManager = AppManager.GetManager<FlowChartManager>();
         while (node != null)
         {
+            if (node is BreakCommand) return false;
+            
             if (node is Command command)
             {
                 await command.Execute(cts);
@@ -102,6 +113,8 @@ public class LogicCommand : Command
                 break;
             }
         }
+        
+        return true;
     }
 
     public override string GetDescription()

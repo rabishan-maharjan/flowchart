@@ -25,7 +25,7 @@ public class WhileLoopCommandUi : CommandUi
 
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;
-            _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+            _exposedVariables = _allVariables.Where(v => v.Exposed || v.BranchID == Command.BranchID).ToList();
 
             //load old variables
             var loopCommand = (WhileLoopCommand)Command;

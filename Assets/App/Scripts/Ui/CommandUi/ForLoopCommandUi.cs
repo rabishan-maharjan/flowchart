@@ -31,7 +31,8 @@ public class ForLoopCommandUi : CommandUi
             ip_name.Text = nameVar != null ? nameVar.Name : "i";
 
             var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-            _exposedVariables = variables.Where(v => v.Exposed && v.Type == VariableType.Number).ToList();
+            _exposedVariables = variables.Where(v => (v.Exposed || v.BranchID == loopCommand.BranchID) && v.Type == VariableType.Number).ToList();
+            
             var v = Variable.TryGetVariable(loopCommand.Start) ?? new Variable();
             dr_ip_start.Set(_exposedVariables, v);
         
@@ -56,8 +57,35 @@ public class ForLoopCommandUi : CommandUi
                 MessageUi.Show("Incomplete parameters");
                 return;
             }
-        
+            
             var loopCommand = (ForLoopCommand)Command;
+            
+            if (string.IsNullOrEmpty(loopCommand.Variable))
+            {
+                var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
+                var oldI = variables.FirstOrDefault(v => v.Name == ip_name.Text);
+                if (oldI != null)
+                {
+                    MessageUi.Show($"Variable with name {oldI.Name} already exists");
+                    return;
+                }
+                
+                var i = new Variable
+                {
+                    Name = ip_name.Text,
+                    BranchID = loopCommand.ID,
+                    Value = "0",
+                    Type = VariableType.Number,
+                    Scope = VariableScope.Local
+                };
+                loopCommand.Variable = i.ID;
+                loopCommand.AddLocalVariable(i);
+            }
+            else
+            {
+                var v = Variable.TryGetVariable(loopCommand.Variable);
+                v.Name = ip_name.Text;
+            }
 
             var start = dr_ip_start.Value;
             start.Type = VariableType.Number;
@@ -69,23 +97,6 @@ public class ForLoopCommandUi : CommandUi
             loopCommand.Start = start.ID; 
             loopCommand.End = end.ID;
             loopCommand.Steps = steps.ID;
-
-            if (string.IsNullOrEmpty(loopCommand.Variable))
-            {
-                var i = new Variable
-                {
-                    Name = ip_name.Text,
-                    Type = VariableType.String,
-                    Scope = VariableScope.Local
-                };
-                loopCommand.Variable = i.ID;
-                AppManager.GetManager<FlowChartManager>().AddVariable(i);
-            }
-            else
-            {
-                var v = Variable.TryGetVariable(loopCommand.Variable);
-                v.Name = ip_name.Text;
-            }
 
             base.Apply();
         }

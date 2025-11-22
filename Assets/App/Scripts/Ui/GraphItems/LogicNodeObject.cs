@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Arcube;
 using UnityEngine;
 
-public class LogicNodeObject : CommandObject
+public class LogicNodeObject : BranchObject
 {
     public ConnectorObject connectorTrue;
     public ConnectorObject connectorFalse;

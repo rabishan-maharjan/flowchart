@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Arcube;
 using Newtonsoft.Json;
 
@@ -15,12 +16,17 @@ public class Variable
 {
     public string ID = Guid.NewGuid().ToString();
     public string Name;
+    public string BranchID;
     public VariableType Type;
     public string Value;
     public bool Assigned;
     public VariableScope Scope = VariableScope.Inline;
     [JsonIgnore] public bool Exposed => Scope is VariableScope.Global or VariableScope.Functional;
-    public Variable() { }
+    
+    public Variable()
+    {
+        BranchID = AppManager.GetManager<FlowChartManager>().Branches[0];
+    }
     
     public Variable(Variable v)
     {
