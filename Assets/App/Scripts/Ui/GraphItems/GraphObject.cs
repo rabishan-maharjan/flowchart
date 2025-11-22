@@ -3,7 +3,18 @@ using UnityEngine.EventSystems;
 
 public class GraphObject : PanelItem, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    protected bool Editable = true;
+    protected override void Awake()
+    {
+        GraphPanelUi.IsDirty = true;
+        base.Awake();
+    }
+
+    private void OnDestroy()
+    {
+        GraphPanelUi.IsDirty = true;
+    }
+
+    public bool Editable { get; protected set; } = true;
     public virtual void OnPointerClick(PointerEventData eventData)
     {
         if(!Editable) return;

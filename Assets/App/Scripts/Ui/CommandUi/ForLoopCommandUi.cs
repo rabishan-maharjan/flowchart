@@ -30,8 +30,8 @@ public class ForLoopCommandUi : CommandUi
             var nameVar = Variable.TryGetVariable(loopCommand.Variable);
             ip_name.Text = nameVar != null ? nameVar.Name : "i";
 
-            var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
-            _exposedVariables = variables.Where(v => (v.Exposed || v.BranchID == loopCommand.BranchID) && v.Type == VariableType.Number).ToList();
+            var variables = AppManager.GetManager<FlowChartManager>().GetExposedAndLocalVariables(Command.BranchID);
+            _exposedVariables = variables.Where(v => v.Type == VariableType.Number).ToList();
             
             var v = Variable.TryGetVariable(loopCommand.Start) ?? new Variable();
             dr_ip_start.Set(_exposedVariables, v);
@@ -60,9 +60,9 @@ public class ForLoopCommandUi : CommandUi
             
             var loopCommand = (ForLoopCommand)Command;
             
+            var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
             if (string.IsNullOrEmpty(loopCommand.Variable))
             {
-                var variables = AppManager.GetManager<FlowChartManager>().ActiveVariables;
                 var oldI = variables.FirstOrDefault(v => v.Name == ip_name.Text);
                 if (oldI != null)
                 {
@@ -83,6 +83,13 @@ public class ForLoopCommandUi : CommandUi
             }
             else
             {
+                var oldI = variables.FirstOrDefault(v => v.Name == ip_name.Text && v.BranchID != loopCommand.ID);
+                if (oldI != null)
+                {
+                    MessageUi.Show($"Variable with name {oldI.Name} already exists");
+                    return;
+                }
+                
                 var v = Variable.TryGetVariable(loopCommand.Variable);
                 v.Name = ip_name.Text;
             }

@@ -10,7 +10,14 @@ public abstract class Command : Node
     [JsonIgnore] public Action OnExecuteStart;
     [JsonIgnore] public Action OnExecuteEnd;
     public bool Completed { get; set; } = false;
-    public abstract Task<bool> Execute(CancellationTokenSource cts);
+
+    public virtual async Task<bool> Execute(CancellationTokenSource cts)
+    {
+        OnExecuteStart?.Invoke();
+        Function.ActiveNode = this;
+        await Task.Run(() => { });
+        return true;
+    }
 
     [JsonIgnore] protected string Description;
     public abstract string GetDescription();

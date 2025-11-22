@@ -69,6 +69,7 @@ public class WhileLoopCommand : BranchCommand
 
             if (node is Command command)
             {
+                command.Completed = false;
                 //Debug.Log($"Executing {command.Name} from loop");
                 await command.Execute(cts);
                 OnLoopStep?.Invoke();

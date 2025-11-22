@@ -45,7 +45,7 @@ public class LogicExpressionPanel : Panel
         
         dr_variable_1.onValueChanged.AddListener((value) =>
         {
-            var v1 = Variable.TryGetVariable(dr_variable_1.options[dr_variable_1.value].text);
+            var v1 = _allVariables[dr_variable_1.value];
             if (v1 == null)
             {
                 MessageUi.Show("Variable is not a valid logic expression");
@@ -57,6 +57,7 @@ public class LogicExpressionPanel : Panel
         });
     }
 
+    private List<Variable> _allVariables;
     public void Set(List<Variable> allVariables, LogicExpression expression)
     {
         if(allVariables.Count == 0)
@@ -64,6 +65,8 @@ public class LogicExpressionPanel : Panel
             MessageUi.Show("No variables available");
             return;
         }
+        
+        _allVariables = allVariables;
         
         dr_variable_1.options = allVariables.Select(n => new TMP_Dropdown.OptionData(n.Name)).ToList();
         var v1 = Variable.TryGetVariable(expression.Variable1);

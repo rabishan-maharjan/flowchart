@@ -15,10 +15,36 @@ public class GraphPanelUi : Ui
     [SerializeField] private Transform container;
     public override Task Register()
     {
+        Application.wantsToQuit += () =>
+        {
+            if (!IsDirty) return true;
+            
+            HandleQuitRequest();
+            return false;
+        };
+
+
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _flowChartManager.OnProjectStateChanged += HandleProjectStateChanged;
         _flowChartManager.OnCompileStateChanged += HandleCompileStateChanged;
         return base.Register();
+    }
+    
+    private async void HandleQuitRequest()
+    {
+        try
+        {
+            var response = await ConfirmationUi.ShowMessage("Unsaved Changes!", "Do you wnat to save the project before quiting?", "Save",
+                "Quit");
+            if (response == ConfirmType.Confirm)
+            {
+                _flowChartManager.Save(_flowChartManager.CurrentFile);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.AddException(e);
+        }
     }
 
     private async void HandleProjectStateChanged(ProjectState state, string projectName)
@@ -34,6 +60,9 @@ public class GraphPanelUi : Ui
                 }
                 case ProjectState.Load:
                     await GenerateFlowChart(_flowChartManager.Functions);
+                    break;
+                case ProjectState.Save:
+                    IsDirty = false;
                     break;
             }
         }

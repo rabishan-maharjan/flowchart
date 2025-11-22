@@ -20,7 +20,7 @@ public class ForLoopCommand : BranchCommand
     public string Steps;
     public override async Task<bool> Execute(CancellationTokenSource cts)
     {
-        OnExecuteStart?.Invoke();
+        await base.Execute(cts);
         //get all commands after this command
         //execute them
         var flowChartManager = AppManager.GetManager<FlowChartManager>(); 
@@ -69,13 +69,11 @@ public class ForLoopCommand : BranchCommand
         var node = flowChartManager.GetNode(NodeLoop);
         while (node != null)
         {
-            if (node is BreakCommand)
-            {
-                return false;
-            }
+            if (node is BreakCommand) return false;
 
             if (node is Command command)
             {
+                command.Completed = false;
                 //Debug.Log($"Executing {command.Name} from loop");
                 var shouldContinue = await command.Execute(cts);
                 await Task.Yield();

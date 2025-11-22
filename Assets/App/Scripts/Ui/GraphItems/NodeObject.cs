@@ -1,9 +1,8 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Arcube;
 
-public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
+public class NodeObject : GraphObject
 {
     protected Node _node;
 
@@ -23,15 +22,11 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
     }
 
     private RectTransform _rectTransform;
-    private Canvas _canvas;
-    private Vector2 _dragOffset;
     protected FlowChartManager FlowChartManager;
-
     protected override void Awake()
     {
         base.Awake();
         _rectTransform = GetComponent<RectTransform>();
-        _canvas = GetComponentInParent<Canvas>();
         FlowChartManager = AppManager.GetManager<FlowChartManager>();
     }
 
@@ -42,57 +37,6 @@ public class NodeObject : GraphObject, IDragHandler, IBeginDragHandler
 
         Image.color = GraphSettings.Instance.colors[Node.Name];
 
-        Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
-    }
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (!Editable) return;
-
-        if (!_rectTransform || !_canvas) return;
-
-        // Calculate the initial offset between the pointer and the object's position
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvas.transform as RectTransform,
-            eventData.position,
-            eventData.pressEventCamera,
-            out _dragOffset
-        );
-        _dragOffset -= _rectTransform.anchoredPosition;
-    }
-
-    public virtual void OnDrag(PointerEventData eventData)
-    {
-        if (!Editable) return;
-
-        if (!_rectTransform || !_canvas) return;
-
-        // Adjust the position of the RectTransform based on the drag event
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _canvas.transform as RectTransform,
-            eventData.position,
-            eventData.pressEventCamera,
-            out var localPoint
-        );
-
-        var prevPosition = _rectTransform.anchoredPosition;
-
-        _rectTransform.anchoredPosition = localPoint - _dragOffset;
-        Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
-
-        var delta = _rectTransform.anchoredPosition - prevPosition;
-
-        MoveBranchNodes(delta);
-
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-        {
-            MoveAllFollowingNodes(delta);
-        }
-    }
-
-    public void Move(int delta)
-    {
-        transform.position += new Vector3(0, delta, 0);
         Node.AnchoredPosition = new Vector2Simple(_rectTransform.anchoredPosition);
     }
     

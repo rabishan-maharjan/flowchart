@@ -66,6 +66,8 @@ public class VariableUi : Ui
     private Variable _variable;
     public async Task<Variable> Open(Variable variable)
     {
+        GraphPanelUi.Selected = null;
+        
         SetFields(variable);
 
         _variable = variable;

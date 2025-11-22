@@ -53,12 +53,13 @@ public class OperationCommandUi : CommandUi
         
         _flowChartManager = AppManager.GetManager<FlowChartManager>();
         _allVariables = _flowChartManager.ActiveVariables;
-        _exposedVariables = _allVariables.Where(v => v.Exposed).ToList();
+        var operationCommand = (OperationCommand)Command;
+        _exposedVariables = _flowChartManager.GetExposedAndLocalVariables(operationCommand.BranchID);
         var variableNames = _exposedVariables.Select(variable => variable.Name).ToList();
         dr_variable.options = variableNames.Select(n => new TMP_Dropdown.OptionData(n)).ToList();
         
         //load old variables
-        var operationCommand = (OperationCommand)Command;
+        
         foreach (var expression in operationCommand.Expressions)
         {
             AddField(expression);

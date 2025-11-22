@@ -17,7 +17,8 @@ public class OutputCommand : Command
     [JsonIgnore] private string Output { get; set; }
     public override async Task<bool> Execute(CancellationTokenSource cts)
     {
-        OnExecuteStart?.Invoke();
+        await base.Execute(cts);
+        
         Output = "";
         foreach (var variable in Variables)
         {

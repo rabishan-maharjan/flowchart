@@ -12,7 +12,6 @@ public class UIDragAndMove : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private int _dragStartIndex;
     private Transform _dragStartParent;
     private LayoutGroup _layoutGroup;
-    private static bool _isDragging;
     private static Transform _placeholder;
 
     private void Start()
@@ -24,7 +23,6 @@ public class UIDragAndMove : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public void OnBeginDrag(PointerEventData eventData)
     {
         GetComponent<CanvasGroup>().interactable = false;
-        _isDragging = true;
 
         _dragStartIndex = transform.GetSiblingIndex();
         _dragStartParent = transform.parent;
@@ -72,7 +70,6 @@ public class UIDragAndMove : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     public void OnEndDrag(PointerEventData eventData)
     {
         GetComponent<CanvasGroup>().interactable = true;
-        _isDragging = false;
 
         if (TryGetComponent(out Image icon))
             icon.raycastTarget = true;

@@ -10,10 +10,10 @@ public class Function
     public List<Variable> Variables { get; set; } = new(); 
     public List<Node> Nodes { get; set; } = new();
 
-    public static event Action<string> OnInput;
+    public static Action<string> OnInput;
     public static Action<string> OnOutput;
     public static event Action<string> OnError;
-    public static Node ActiveNode { get; private set; }
+    public static Node ActiveNode { get; set; }
     public async Task Execute(CancellationTokenSource cts)
     {
         var backup = Variables.ConvertAll(v => new Variable(v));
@@ -27,11 +27,6 @@ public class Function
                 //Debug.Log($"Executing {ActiveNode.Name}");
 
                 var command = (Command)ActiveNode;
-                if (command is InputCommand inputCommand)
-                {
-                    OnInput?.Invoke(inputCommand.Variable);
-                }
-
                 await command.Execute(cts);
                 await Task.Yield();
                 nodeId = command.NextNode;

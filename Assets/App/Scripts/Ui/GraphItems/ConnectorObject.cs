@@ -4,16 +4,9 @@ using Arcube;
 using Arcube.UiManagement;
 using UnityEngine;
 
-public enum NodeType
-{
-    Input,
-    Flow,
-}
-
 public class ConnectorObject : GraphObject
 {
     [SerializeField] public bool branchNode = false;
-    [SerializeField] private NodeType nodeType = NodeType.Flow;
     [field: SerializeField] public NodeObject ParentNodeObject { get; set; }
     public NodeObject NextNodeObject { get; private set; }
 

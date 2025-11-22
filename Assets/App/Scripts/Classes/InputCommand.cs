@@ -14,7 +14,9 @@ public class InputCommand : Command
 
     public override async Task<bool> Execute(CancellationTokenSource cts)
     {
-        OnExecuteStart?.Invoke();
+        await base.Execute(cts);
+        
+        Function.OnInput?.Invoke(Variable);
         if (string.IsNullOrEmpty(Variable))
         {
             throw new Exception("Variable is null");
@@ -25,6 +27,7 @@ public class InputCommand : Command
             await Task.Yield();
             cts.Token.ThrowIfCancellationRequested();
         }
+        
         OnExecuteEnd?.Invoke();
         return true;
     }

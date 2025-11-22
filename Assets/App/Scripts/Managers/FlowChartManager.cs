@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Arcube;
 using Arcube.UiManagement;
+using UnityEngine;
+using Task = UnityEditor.VersionControl.Task;
 
 public enum CompileState
 {
@@ -30,6 +33,8 @@ public class FlowChartManager : ManagerBase
 {
     private const string ActiveFunction = "Main";
     public Dictionary<string, Variable> VariableMap { get; set; } = new();
+
+    public List<Variable> GetExposedAndLocalVariables(string branchID) => ActiveVariables.Where(v => v.Exposed || (v.BranchID == branchID && v.Scope == VariableScope.Local)).ToList();
     public Dictionary<string, Function> Functions { get; private set; } = new();
     public List<Variable> ActiveVariables => Functions[ActiveFunction].Variables;
     public List<Node> ActiveNodes => Functions[ActiveFunction].Nodes;
@@ -154,5 +159,10 @@ public class FlowChartManager : ManagerBase
     {
         OnCompileStateChanged?.Invoke(CompileState.Work);
         _cts.Cancel();
+    }
+
+    private void OnApplicationQuit()
+    {
+        
     }
 }

@@ -26,7 +26,7 @@ public class LogicCommandUi : CommandUi
             
             _flowChartManager = AppManager.GetManager<FlowChartManager>();
             _allVariables = _flowChartManager.ActiveVariables;
-            _exposedVariables = _allVariables.Where(v => v.Exposed || v.BranchID == Command.BranchID).ToList();
+            _exposedVariables = _flowChartManager.GetExposedAndLocalVariables(Command.BranchID);
             
             //load old variables
             var logicCommand = (LogicCommand)Command;

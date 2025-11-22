@@ -7,11 +7,15 @@ public class BreakCommand : Command
     {
         Name = "BreakCommand";
     }
-    
+
     public override async Task<bool> Execute(CancellationTokenSource cts)
     {
-        await Task.Yield();
+        await base.Execute(cts);
+
+        await Task.Run(() => { });
         Completed = true;
+
+        OnExecuteEnd?.Invoke();
         return false;
     }
 

@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 6573035059024967269}
   - component: {fileID: -4779767028415533589}
   - component: {fileID: 3801293582574951726}
+  - component: {fileID: -1036045481171373824}
   m_Layer: 5
   m_Name: EndNode
   m_TagString: Untagged
@@ -274,3 +275,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-1036045481171373824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4964585417304039075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3fdadae71404bdab64a7fcc66e8c9c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NodeDragger
